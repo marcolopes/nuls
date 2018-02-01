@@ -32,7 +32,10 @@ public class NotifyModule extends BaseModuleBootstrap {
         eventBusService = EventBusServiceImpl.getInstance();
         eventBusService.subscribeEvent(BaseEvent.class, new EventsHandler());
         host = getModuleCfgProperty("notify","notify.host");
-        port = Short.parseShort(getModuleCfgProperty("notify","notify.port"));
+        String portString = getModuleCfgProperty("notify","notify.port");
+        if (portString != null) {
+            port = Short.parseShort(portString);
+        }
     }
 
     @Override
