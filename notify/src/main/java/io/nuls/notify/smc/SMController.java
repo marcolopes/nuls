@@ -20,18 +20,40 @@ public class SMController {
 
     public void addSubscriber(WebSocket sock) {
         SubscriberDO subscriberDO = new SubscriberDO(sock);
-        subscriberMap.put(subscriberDO.getSubscriberHash(),subscriberDO);
+        Integer key = subscriberDO.getSubscriberHash();
+        if (!subscriberMap.containsKey(key)) {
+            subscriberMap.put(key, subscriberDO);
+        } else {
+            // What happen!
+            WebSocket socket = (WebSocket)subscriberMap.get(key);
+            socket.close();
+            subscriberMap.remove(key);
+        }
     }
 
     public void removeSubscriber(WebSocket sock) {
         Integer key = SubscriberDO.genericHash(sock);
-        subscriberMap.remove(key);
+        if (subscriberMap.containsKey(key)) {
+            subscriberMap.remove(key);
+        }
     }
 
-    public void handleSubscriberMsg(WebSocket sock,String msg) {
+    public void handleSubscriberMsg(WebSocket sock, String msg) {
         Integer key = SubscriberDO.genericHash(sock);
+        if (!subscriberMap.containsKey(key)) {
+            return;
+        }
+
         SubscriberDO subscriberDO = subscriberMap.get(key);
 
         // decode Json Object
+    }
+
+    public void removeAllSubscriber() {
+
+    }
+
+    private void process() {
+
     }
 }
