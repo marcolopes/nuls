@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
+import io.nuls.core.context.NulsContext;
 import io.nuls.core.utils.spring.lite.annotation.Autowired;
 import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
@@ -27,7 +28,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
 
-        Node node = networkService.getNode(channel.remoteAddress().getHostString());
+        Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         //check node exist
         if(node != null && node.getStatus() != Node.WAIT) {
             channel.close();
@@ -36,14 +37,14 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         NioChannelMap.add(channelId, channel);
         node.setChannelId(channelId);
         node.setStatus(Node.CONNECT);
-        networkService.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
+        getNetworkService().addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("---------- client  channelInactive  ------------");
         SocketChannel channel = (SocketChannel) ctx.channel();
-        Node node = networkService.getNode(channel.remoteAddress().getHostString());
+        Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         if(node != null) {
             node.destroy();
         }
@@ -58,7 +59,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         buf.readBytes(bytes);
         ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
         buffer.put(bytes);
-
     }
 
     @Override
@@ -72,6 +72,13 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         System.out.println("---------- client  exceptionCaught  ------------");
         cause.printStackTrace();
         ctx.channel().close();
+    }
+
+    private NetworkService getNetworkService() {
+        if(networkService == null) {
+            networkService = NulsContext.getServiceBean(NetworkService.class);
+        }
+        return networkService;
     }
 
 }

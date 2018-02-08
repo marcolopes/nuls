@@ -43,7 +43,6 @@ public class NettyClient {
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             //maybe time out or something
-            e.printStackTrace();
             if (socketChannel != null) {
                 socketChannel.close();
             }
