@@ -23,6 +23,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("---------- client  channelRegistered  ------------");
         String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
 
@@ -36,21 +37,21 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         node.setChannelId(channelId);
         node.setStatus(Node.CONNECT);
         networkService.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
-        System.out.println("-------111111111111------------");
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("---------- client  channelInactive  ------------");
         SocketChannel channel = (SocketChannel) ctx.channel();
         Node node = networkService.getNode(channel.remoteAddress().getHostString());
         if(node != null) {
             node.destroy();
         }
-        System.out.println("-------2222222222222222222------------");
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws UnsupportedEncodingException {
+        System.out.println("---------- client  channelRead  ------------");
         String channelId = ctx.channel().id().asLongText();
         ByteBuf buf = (ByteBuf) msg;
         byte[] bytes = new byte[buf.readableBytes()];
@@ -62,14 +63,15 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
+        System.out.println("---------- client  channelReadComplete  ------------");
         ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        System.out.println("---------- client  exceptionCaught  ------------");
         cause.printStackTrace();
         ctx.channel().close();
-        System.out.println("-------client exception------------");
     }
 
 }
