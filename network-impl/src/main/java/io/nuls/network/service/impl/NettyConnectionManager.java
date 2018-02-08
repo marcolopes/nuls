@@ -49,16 +49,16 @@ public class NettyConnectionManager {
     }
 
     public void start() throws InterruptedException {
-//        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "node connection", new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    nettyServer.start();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, false);
+        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "node connection", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    nettyServer.start();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, false);
 
     }
 
