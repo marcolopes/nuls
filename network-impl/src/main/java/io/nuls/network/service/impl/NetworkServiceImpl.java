@@ -67,7 +67,7 @@ public class NetworkServiceImpl implements NetworkService {
 
         this.connectionManager = new NettyConnectionManager(network);
         this.nodesManager = new NettyNodesManager(network, connectionManager);
-       // this.broadcaster = new BroadcasterImpl(nodesManager, network);
+        // this.broadcaster = new BroadcasterImpl(nodesManager, network);
 
 //        GetNodeEventHandler.getInstance().setNodesManager(nodesManager);
 //        NodeEventHandler.getInstance().setNodesManager(nodesManager);
@@ -75,10 +75,10 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public void init() {
-        try{
+        try {
             connectionManager.init();
             nodesManager.init();
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.error(e);
             throw new NulsRuntimeException(ErrorCode.NET_SERVER_START_ERROR);
         }
@@ -309,6 +309,11 @@ public class NetworkServiceImpl implements NetworkService {
     @Override
     public BroadcastResult sendToGroup(String area, byte[] data, String groupName, String excludeNodeId) {
         return null;
+    }
+
+    @Override
+    public void processMessage(Byte[] msg, Node node) {
+        connectionManager.processMessage(msg, node);
     }
 
     private AbstractNetworkParam getNetworkInstance() {

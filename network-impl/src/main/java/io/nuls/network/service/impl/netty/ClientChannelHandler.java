@@ -10,6 +10,7 @@ import io.nuls.network.entity.Node;
 import io.nuls.network.service.NetworkService;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
@@ -54,8 +55,8 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
-        String strMsg = new String(bytes, "UTF-8");
-        System.out.println(channelId + ":" + strMsg);
+        ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+        buffer.put(bytes);
     }
 
     @Override

@@ -71,4 +71,8 @@ public class NettyConnectionManager {
             }
         }, false);
     }
+
+    public void processMessage(Byte[] msg, Node node) {
+
+    }
 }
