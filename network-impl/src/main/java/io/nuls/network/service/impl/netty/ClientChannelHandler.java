@@ -57,6 +57,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         buf.readBytes(bytes);
         ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
         buffer.put(bytes);
+
     }
 
     @Override
@@ -66,8 +67,8 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        System.out.println("-------3333333333333333333333333333------------");
         cause.printStackTrace();
+        System.out.println("-------client exception------------");
     }
 
 }

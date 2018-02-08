@@ -108,12 +108,12 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public void removeNode(String nodeId) {
-
+        nodesManager.removeNode(nodeId);
     }
 
     @Override
     public boolean containsNode(String nodeId) {
-        return false;
+        return nodesManager.containsNode(nodeId);
     }
 
     @Override

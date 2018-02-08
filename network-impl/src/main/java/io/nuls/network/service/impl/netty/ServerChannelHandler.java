@@ -19,13 +19,16 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        SocketChannel socketChannel = (SocketChannel) ctx.channel();
+
+        if (networkService.containsNode(socketChannel.remoteAddress().getHostString())) {
+            ctx.channel().close();
+            return;
+        }
         NodeGroup group = networkService.getNodeGroup(NetworkConstant.NETWORK_NODE_IN_GROUP);
         if (group.size() > networkService.getNetworkParam().maxInCount()) {
             ctx.channel().close();
-        }
-        SocketChannel socketChannel = (SocketChannel) ctx.channel();
-        if (networkService.containsNode(socketChannel.remoteAddress().getAddress().getHostAddress())) {
-            ctx.channel().close();
+            return;
         }
     }
 
@@ -34,15 +37,17 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
         NioChannelMap.add(channelId, channel);
-        Node node = new Node(networkService.getNetworkParam(), Node.IN, channel.remoteAddress().getHostName(), channel.remoteAddress().getPort(), channelId);
+        Node node = new Node(networkService.getNetworkParam(), Node.IN, channel.remoteAddress().getHostString(), channel.remoteAddress().getPort(), channelId);
+        node.setStatus(Node.CONNECT);
         networkService.addNodeToGroup(NetworkConstant.NETWORK_NODE_IN_GROUP, node);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        SocketChannel channel = (SocketChannel) ctx.channel();
         String channelId = ctx.channel().id().asLongText();
         NioChannelMap.remove(channelId);
-        networkService.removeNode(channelId);
+        networkService.removeNode(channel.remoteAddress().getHostString());
     }
 
     @Override

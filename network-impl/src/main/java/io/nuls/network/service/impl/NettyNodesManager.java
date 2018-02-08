@@ -113,6 +113,10 @@ public class NettyNodesManager implements Runnable {
         return nodes.get(nodeId);
     }
 
+    public boolean containsNode(String nodeId) {
+        return nodes.containsKey(nodeId);
+    }
+
     public void addNode(Node node) {
         lock.lock();
         try {
@@ -124,6 +128,12 @@ public class NettyNodesManager implements Runnable {
             }
         } finally {
             lock.unlock();
+        }
+    }
+
+    public void removeNode(String nodeId) {
+        if (!nodes.containsKey(nodeId)) {
+            nodes.remove(nodeId);
         }
     }
 
