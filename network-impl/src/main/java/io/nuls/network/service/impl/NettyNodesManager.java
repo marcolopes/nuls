@@ -122,9 +122,9 @@ public class NettyNodesManager implements Runnable {
         try {
             if (!nodes.containsKey(node.getIp())) {
                 nodes.put(node.getIp(), node);
-            }
-            if (node.getStatus() == Node.WAIT) {
-                connectionManager.connectionNode(node);
+                if (node.getStatus() == Node.WAIT) {
+                    connectionManager.connectionNode(node);
+                }
             }
         } finally {
             lock.unlock();
