@@ -164,7 +164,7 @@ public class ConnectionHandler implements MessageWriter {
                     return;
                 }
                 // "flip" the buffer - setting the limit to the current position and setting position to 0
-                handler.node.receiveMessage(handler.readBuffer);
+            //    handler.node.receiveMessage(handler.readBuffer);
                 // Now drop the bytes which were read by compacting readBuff (resetting limit and keeping relative position)
             } else if (key.isWritable()) {
                 handler.writeBytes();

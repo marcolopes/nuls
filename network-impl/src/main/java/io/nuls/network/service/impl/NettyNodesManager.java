@@ -60,6 +60,8 @@ public class NettyNodesManager implements Runnable {
 
     private NettyConnectionManager connectionManager;
 
+    private boolean running;
+
     public NettyNodesManager(AbstractNetworkParam network, NettyConnectionManager connectionManager) {
         this.network = network;
         this.connectionManager = connectionManager;
@@ -68,6 +70,8 @@ public class NettyNodesManager implements Runnable {
         NodeGroup outNodes = new NodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
         nodeGroups.put(inNodes.getName(), inNodes);
         nodeGroups.put(outNodes.getName(), outNodes);
+
+        discoverHandler = new NodeDiscoverHandler(this, network, null);
     }
 
     /**
@@ -92,10 +96,10 @@ public class NettyNodesManager implements Runnable {
         for (Node node : nodes) {
             node.setType(Node.OUT);
             node.setStatus(Node.WAIT);
-
             addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
         }
-        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "connectionManager", discoverHandler);
+        running = true;
+        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "connectionManager", this);
     }
 
     public List<Node> getSeedNodes() {
@@ -112,7 +116,7 @@ public class NettyNodesManager implements Runnable {
     public void addNode(Node node) {
         lock.lock();
         try {
-            if (!nodes.containsKey(node.getIp().toString())) {
+            if (!nodes.containsKey(node.getIp())) {
                 nodes.put(node.getIp(), node);
             }
             if (node.getStatus() == Node.WAIT) {
@@ -127,7 +131,6 @@ public class NettyNodesManager implements Runnable {
         if (!nodeGroups.containsKey(groupName)) {
             throw new NulsRuntimeException(ErrorCode.NET_NODE_GROUP_NOT_FOUND);
         }
-
         NodeGroup group = nodeGroups.get(groupName);
         if (groupName.equals(NetworkConstant.NETWORK_NODE_OUT_GROUP) &&
                 group.size() >= network.maxOutCount()) {
@@ -138,19 +141,48 @@ public class NettyNodesManager implements Runnable {
                 group.size() >= network.maxInCount()) {
             return;
         }
-
+        node.getGroupSet().add(group.getName());
         addNode(node);
-        node.getGroupSet().add(group);
         group.addNode(node);
     }
 
 
     /**
-     * do ping/pong
+     * check connecting node enough
      */
     @Override
     public void run() {
+        while (running) {
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            for (Node node : nodes.values()) {
+                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus());
+                if (node.getStatus() == Node.CLOSE) {
+                    for (String groupName : node.getGroupSet()) {
+                        NodeGroup group = nodeGroups.get(groupName);
+                        if (group != null) {
+                            group.removeNode(node);
+                        }
+                        nodes.remove(node.getIp());
+                    }
+                    node = null;
+                }
+            }
+            if (nodes.isEmpty()) {
+                List<Node> nodes = getSeedNodes();
+                for (Node node : nodes) {
+                    node.setType(Node.OUT);
+                    node.setStatus(Node.WAIT);
+                    addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
+                }
+            }
+            System.out.println("------------华丽的分割线----------------");
 
+            try {
+                Thread.sleep(7000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public Map<String, Node> getNodes() {

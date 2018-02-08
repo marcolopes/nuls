@@ -7,7 +7,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.AttributeKey;
 import io.nuls.core.utils.log.Log;
 import io.nuls.network.entity.Node;
 
@@ -42,10 +41,20 @@ public class NettyClient {
                 node.destroy();
             }
             future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            Log.error(e);
-            socketChannel.close();
+        } catch (Exception e) {
+            //maybe time out or something
+            if (socketChannel != null) {
+                socketChannel.close();
+            }
             node.destroy();
         }
+    }
+
+    public static void main(String[] args) {
+        Node node = new Node();
+        node.setIp("192.168.0.144");
+        node.setPort(8003);
+        new NettyClient(node).start();
+
     }
 }

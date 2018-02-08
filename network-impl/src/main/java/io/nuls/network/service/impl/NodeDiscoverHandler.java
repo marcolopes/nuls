@@ -24,7 +24,9 @@
 package io.nuls.network.service.impl;
 
 import io.nuls.db.dao.NodeDataService;
+import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
+import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 
 import java.net.InetSocketAddress;
@@ -75,7 +77,7 @@ public class NodeDiscoverHandler implements Runnable {
         List<Node> seedNodes = new ArrayList<>();
         for (InetSocketAddress socketAddress : network.getSeedNodes()) {
             // remove myself
-            if (network.getLocalIps().contains(socketAddress.getAddress().getHostAddress())) {
+            if (network.getLocalIps().contains(socketAddress.getHostString())) {
                 continue;
             }
             seedNodes.add(new Node(network, Node.OUT, socketAddress));
@@ -88,57 +90,7 @@ public class NodeDiscoverHandler implements Runnable {
      */
     @Override
     public void run() {
-        while (running) {
-            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-            for (Node node : nodesManager.getNodes().values()) {
 
-                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus());
-            }
-            System.out.println("------------华丽的分割线----------------");
-
-//            NodeGroup outNodes = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-//            if(outNodes.size() == 0) {
-//                List<Node> nodes = getSeedNodes();
-//                for (Node newNode : nodes) {
-//                    if (outNodes.getNodes().values().contains(newNode)) {
-//                        continue;
-//                    }
-//                    nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
-//                }
-//            }
-
-//            NodeGroup outNodes = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-//            if (outNodes.size() == 0) {
-//                //  The seedNodes should be connected immediately
-//                List<Node> nodes = getSeedNodes();
-//
-//                for (Node newNode : nodes) {
-//                    if (outNodes.getNodes().values().contains(newNode)) {
-//                        continue;
-//                    }
-//                    nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
-//                }
-//            } else if (outNodes.size() < network.maxOutCount()) {
-//                List<Node> nodes = getLocalNodes(network.maxOutCount() - outNodes.size());
-//                if (nodes.isEmpty()) {
-////                    // find other node from connected nodes
-//                    findOtherNode(network.maxOutCount() - outNodes.size());
-//                } else {
-//                    for (Node newNode : nodes) {
-//                        if (outNodes.getNodes().values().contains(newNode)) {
-//                            continue;
-//                        }
-//                        nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
-//                    }
-//                }
-//            }
-
-            try {
-                Thread.sleep(7000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**

@@ -24,6 +24,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
+
         Node node = networkService.getNode(channel.remoteAddress().getHostString());
         //check node exist
         if(node != null && node.getStatus() != Node.WAIT) {
@@ -34,6 +35,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         node.setChannelId(channelId);
         node.setStatus(Node.CONNECT);
         networkService.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
+        System.out.println("-------111111111111------------");
     }
 
     @Override
@@ -43,6 +45,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         if(node != null) {
             node.destroy();
         }
+        System.out.println("-------2222222222222222222------------");
     }
 
     @Override
@@ -62,6 +65,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        System.out.println("-------3333333333333333333333333333------------");
         cause.printStackTrace();
     }
 
