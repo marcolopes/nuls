@@ -80,7 +80,7 @@ public class EventBroadcasterImpl implements EventBroadcaster {
             return list;
         }
         for (Node node : result.getBroadcastNodes()) {
-            list.add(node.getHash());
+            list.add(node.getIp());
         }
         return list;
     }

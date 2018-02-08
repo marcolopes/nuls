@@ -27,6 +27,7 @@ import io.nuls.core.event.BaseEvent;
 import io.nuls.network.entity.BroadcastResult;
 import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeGroup;
+import io.nuls.network.entity.param.AbstractNetworkParam;
 
 /**
  * @author vivi
@@ -44,6 +45,10 @@ public interface NetworkService {
 
     void removeNode(String nodeId);
 
+    boolean containsNode(String nodeId);
+
+    Node getNode(String nodeId);
+
     void blackNode(String nodeId, int status);
 
     void addNodeToGroup(String groupName, Node node);
@@ -57,6 +62,10 @@ public interface NetworkService {
     void addNodeGroup(NodeGroup nodeGroup);
 
     void addNodeGroup(String area,NodeGroup nodeGroup);
+
+    NodeGroup getNodeGroup(String groupName);
+
+    AbstractNetworkParam getNetworkParam();
 
     BroadcastResult sendToAllNode(BaseEvent event);
 

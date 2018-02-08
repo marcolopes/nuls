@@ -24,17 +24,12 @@
 package io.nuls.network.service.impl;
 
 import io.nuls.db.dao.NodeDataService;
-import io.nuls.db.entity.NodePo;
-import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
-import io.nuls.network.entity.NodeGroup;
-import io.nuls.network.entity.NodeTransferTool;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author vivi
@@ -44,36 +39,36 @@ public class NodeDiscoverHandler implements Runnable {
 
     private AbstractNetworkParam network;
 
-    private NodesManager nodesManager;
+    private NettyNodesManager nodesManager;
 
     private NodeDataService nodeDao;
 
     private boolean running;
 
 
-    public NodeDiscoverHandler(NodesManager nodesManager, AbstractNetworkParam network, NodeDataService nodeDao) {
+    public NodeDiscoverHandler(NettyNodesManager nodesManager, AbstractNetworkParam network, NodeDataService nodeDao) {
         this.nodesManager = nodesManager;
         this.network = network;
         this.running = true;
         this.nodeDao = nodeDao;
     }
 
-    // get nodes from local database
-    public List<Node> getLocalNodes(int size) {
-        Set<String> keys = nodesManager.getNodes().keySet();
-        List<NodePo> nodePos = nodeDao.getRandomNodePoList(size, keys);
-
-        List<Node> nodes = new ArrayList<>();
-        if (nodePos == null || nodePos.isEmpty()) {
-            return nodes;
-        }
-        for (NodePo po : nodePos) {
-            Node node = new Node(network);
-            NodeTransferTool.toNode(node, po);
-            nodes.add(node);
-        }
-        return nodes;
-    }
+//    // get nodes from local database
+//    public List<Node> getLocalNodes(int size) {
+//        Set<String> keys = nodesManager.getNodes().keySet();
+//        List<NodePo> nodePos = nodeDao.getRandomNodePoList(size, keys);
+//
+//        List<Node> nodes = new ArrayList<>();
+//        if (nodePos == null || nodePos.isEmpty()) {
+//            return nodes;
+//        }
+//        for (NodePo po : nodePos) {
+//            Node node = new Node(network);
+//            NodeTransferTool.toNode(node, po);
+//            nodes.add(node);
+//        }
+//        return nodes;
+//    }
 
 
     public List<Node> getSeedNodes() {
@@ -95,25 +90,22 @@ public class NodeDiscoverHandler implements Runnable {
     public void run() {
         while (running) {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
             for (Node node : nodesManager.getNodes().values()) {
-                if (node.getStatus() == Node.CLOSE) {
-                    nodesManager.removeNode(node.getHash());
-                }
-                System.out.println("-------------hash:" + node.getHash() + "-------status:" + node.getStatus());
+
+                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus());
             }
             System.out.println("------------华丽的分割线----------------");
 
-            NodeGroup outNodes = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-            if(outNodes.size() == 0) {
-                List<Node> nodes = getSeedNodes();
-                for (Node newNode : nodes) {
-                    if (outNodes.getNodes().values().contains(newNode)) {
-                        continue;
-                    }
-                    nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
-                }
-            }
+//            NodeGroup outNodes = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
+//            if(outNodes.size() == 0) {
+//                List<Node> nodes = getSeedNodes();
+//                for (Node newNode : nodes) {
+//                    if (outNodes.getNodes().values().contains(newNode)) {
+//                        continue;
+//                    }
+//                    nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
+//                }
+//            }
 
 //            NodeGroup outNodes = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
 //            if (outNodes.size() == 0) {

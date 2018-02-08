@@ -24,13 +24,11 @@
 package io.nuls.network.message.impl;
 
 import io.nuls.core.event.BaseEvent;
-import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
 import io.nuls.network.message.NetworkCacheService;
 import io.nuls.network.message.NetworkEventResult;
 import io.nuls.network.message.entity.NodeEvent;
 import io.nuls.network.message.handler.NetWorkEventHandler;
-import io.nuls.network.service.impl.NodesManager;
 
 /**
  * @author vivi
@@ -40,7 +38,7 @@ public class NodeEventHandler implements NetWorkEventHandler {
 
     private static final NodeEventHandler INSTANCE = new NodeEventHandler();
 
-    private NodesManager nodesManager;
+//    private NodesManager nodesManager;
 
     private NetworkCacheService cacheService;
 
@@ -66,12 +64,12 @@ public class NodeEventHandler implements NetWorkEventHandler {
         for (Node newNode : event.getEventBody().getNodes()) {
             newNode.setType(Node.OUT);
             newNode.setMessageHandlerFactory(node.getMessageHandlerFactory());
-            nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
+//            nodesManager.addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, newNode);
         }
         return null;
     }
 
-    public void setNodesManager(NodesManager nodesManager) {
-        this.nodesManager = nodesManager;
-    }
+//    public void setNodesManager(NodesManager nodesManager) {
+//        this.nodesManager = nodesManager;
+//    }
 }

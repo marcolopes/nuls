@@ -77,7 +77,7 @@ public class Node extends BaseNulsData {
 
     private int magicNumber;
 
-    private String hash;
+    private String channelId;
 
     private String ip;
 
@@ -102,7 +102,7 @@ public class Node extends BaseNulsData {
      * 0: wait , 1: connecting, 2: handshake 3: close
      */
     public final static int WAIT = 0;
-    public final static int CONNECTING = 1;
+    public final static int CONNECT = 1;
     public final static int HANDSHAKE = 2;
     public final static int CLOSE = 3;
     private volatile int status;
@@ -135,18 +135,22 @@ public class Node extends BaseNulsData {
         this.type = type;
     }
 
+    public Node(AbstractNetworkParam network, int type, String ip, int port, String channelId) {
+        this(network, type);
+        this.port = port;
+        this.ip = ip;
+        this.channelId = channelId;
+    }
 
     public Node(AbstractNetworkParam network, int type, InetSocketAddress socketAddress) {
         this(network, type);
         this.port = socketAddress.getPort();
         this.ip = socketAddress.getAddress().getHostAddress();
-        this.hash = this.ip + this.port;
     }
 
     public void connectionOpened() throws IOException {
         GetVersionEvent event = new GetVersionEvent(AbstractNetworkModule.ExternalPort);
         sendNetworkEvent(event);
-        this.status = Node.CONNECTING;
     }
 
     public void sendMessage(NulsMessage message) throws IOException {
@@ -245,7 +249,7 @@ public class Node extends BaseNulsData {
 //            if (checkBroadcastExist(message.getData())) {
 //                return;
 //            }
-            eventBusService.publishNetworkEvent(event, this.getHash());
+            eventBusService.publishNetworkEvent(event, this.getIp());
         }
     }
 
@@ -298,17 +302,8 @@ public class Node extends BaseNulsData {
     }
 
     public void destroy() {
-//        lock.lock();
-//        try {
-//            this.lastFailTime = TimeService.currentTimeMillis();
-//            this.status = Node.CLOSE;
-//            if (this.writeTarget != null) {
-//                this.writeTarget.closeConnection();
-//                this.writeTarget = null;
-//            }
-//        } finally {
-//            lock.unlock();
-//        }
+        this.lastFailTime = TimeService.currentTimeMillis();
+        this.status = Node.CLOSE;
     }
 
     @Override
@@ -385,15 +380,12 @@ public class Node extends BaseNulsData {
         this.type = type;
     }
 
-    public String getHash() {
-        if (StringUtils.isBlank(hash)) {
-            hash = ip + port;
-        }
-        return hash;
+    public String getChannelId() {
+        return channelId;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash;
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 
     public String getIp() {
@@ -475,10 +467,10 @@ public class Node extends BaseNulsData {
     @Override
     public boolean equals(Object obj) {
         Node other = (Node) obj;
-        if (StringUtils.isBlank(other.getHash())) {
+        if (StringUtils.isBlank(other.getIp())) {
             return false;
         }
-        return other.getHash().equals(this.hash);
+        return other.getIp().equals(this.ip);
     }
 
     public void addToGroup(NodeGroup nodeGroup) {

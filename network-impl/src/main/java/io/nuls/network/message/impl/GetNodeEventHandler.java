@@ -30,7 +30,6 @@ import io.nuls.network.message.NetworkEventResult;
 import io.nuls.network.message.entity.GetNodeEvent;
 import io.nuls.network.message.entity.NodeEvent;
 import io.nuls.network.message.handler.NetWorkEventHandler;
-import io.nuls.network.service.impl.NodesManager;
 
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class GetNodeEventHandler implements NetWorkEventHandler {
 
     private static final GetNodeEventHandler INSTANCE = new GetNodeEventHandler();
 
-    private NodesManager nodesManager;
+//    private NodesManager nodesManager;
 
     private NetworkCacheService cacheService;
 
@@ -65,13 +64,14 @@ public class GetNodeEventHandler implements NetWorkEventHandler {
         }
         cacheService.putEvent(key, event, false);
 
-        List<Node> list = nodesManager.getAvailableNodes(getNodeEvent.getEventBody().getVal(), node);
+        List<Node> list = null;
+                //nodesManager.getAvailableNodes(getNodeEvent.getEventBody().getVal(), node);
         NodeEvent replyData = new NodeEvent(list);
         return new NetworkEventResult(true, replyData);
     }
 
-    public void setNodesManager(NodesManager nodesManager) {
-        this.nodesManager = nodesManager;
-    }
+//    public void setNodesManager(NodesManager nodesManager) {
+//        this.nodesManager = nodesManager;
+//    }
 
 }

@@ -23,8 +23,10 @@
  */
 package io.nuls.network.entity;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author vivi
@@ -47,16 +49,16 @@ public class NodeGroup {
 
     public void addNode(Node p) {
         for (Node node : nodeMap.values()) {
-            if (node.getHash().toString().equals(p.getHash().toString())) {
+            if (node.getIp().equals(p.getIp())) {
                 return;
             }
         }
-        this.nodeMap.put(p.getHash(),p);
+        this.nodeMap.put(p.getIp(),p);
         p.addToGroup(this);
     }
 
     public void removeNode(Node node) {
-        this.nodeMap.remove(node.getHash());
+        this.nodeMap.remove(node.getIp());
         node.removeFromGroup(this);
     }
 

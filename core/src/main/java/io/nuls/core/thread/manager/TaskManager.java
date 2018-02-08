@@ -100,11 +100,12 @@ public class TaskManager {
         createAndRunThread(moduleId,threadName,runnable,true);
     }
 
-    public static final void createAndRunThread(short moduleId, String threadName, Runnable runnable, boolean deamon) {
+    public static final void createAndRunThread(short moduleId, String threadName, Runnable runnable, boolean daemon) {
         NulsThreadFactory factory = new NulsThreadFactory(moduleId, threadName);
         Thread thread = factory.newThread(runnable);
-        thread.setDaemon(deamon);
+        thread.setDaemon(daemon);
         thread.start();
+
     }
 
     public static final List<BaseThread> getThreadList(short moduleId) {

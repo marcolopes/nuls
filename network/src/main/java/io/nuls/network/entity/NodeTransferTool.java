@@ -42,7 +42,6 @@ public class NodeTransferTool {
         node.setMagicNumber(po.getMagicNum());
         node.setFailCount(po.getFailCount());
         node.setVersion(new NulsVersion(po.getVersion()));
-        node.setHash(po.getId());
     }
 
 
@@ -62,7 +61,6 @@ public class NodeTransferTool {
         if(po.getFailCount() == null) {
             po.setFailCount(0);
         }
-        po.setId(node.getHash());
         return po;
     }
 }
