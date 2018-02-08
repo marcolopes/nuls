@@ -37,7 +37,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         NioChannelMap.add(channelId, channel);
         node.setChannelId(channelId);
         node.setStatus(Node.CONNECT);
-        getNetworkService().addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
+        //getNetworkService().addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
     }
 
     @Override
