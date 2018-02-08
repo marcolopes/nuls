@@ -6,7 +6,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
 import io.nuls.core.context.NulsContext;
 import io.nuls.core.utils.spring.lite.annotation.Autowired;
-import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
 import io.nuls.network.service.NetworkService;
 
@@ -31,7 +30,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         //check node exist
         if (node != null && node.getStatus() != Node.WAIT) {
-            channel.close();
+            ctx.channel().close();
             return;
         }
         NioChannelMap.add(channelId, channel);
@@ -63,12 +62,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         buf.readBytes(bytes);
         ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
         buffer.put(bytes);
-    }
-
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        System.out.println("---------- client  channelReadComplete  ------------");
-        ctx.flush();
     }
 
     @Override

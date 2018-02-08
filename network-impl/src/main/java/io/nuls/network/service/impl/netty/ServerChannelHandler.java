@@ -65,12 +65,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("----  service channelReadComplete() ------------");
-        ctx.flush();
-    }
-
-    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("----  service channelRead() ------------");
         String channelId = ctx.channel().id().asLongText();
