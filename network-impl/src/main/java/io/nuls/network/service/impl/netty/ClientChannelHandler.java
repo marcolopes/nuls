@@ -30,7 +30,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         //check node exist
-        if(node != null && node.getStatus() != Node.WAIT) {
+        if (node != null && node.getStatus() != Node.WAIT) {
             channel.close();
             return;
         }
@@ -43,10 +43,14 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("---------- client  channelInactive  ------------");
+        String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
+        NioChannelMap.remove(channelId);
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
-        if(node != null) {
-            node.destroy();
+        if (node != null) {
+            if (node.getChannelId() == null || channelId.equals(node.getChannelId())) {
+                node.destroy();
+            }
         }
     }
 
@@ -75,7 +79,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     }
 
     private NetworkService getNetworkService() {
-        if(networkService == null) {
+        if (networkService == null) {
             networkService = NulsContext.getServiceBean(NetworkService.class);
         }
         return networkService;
