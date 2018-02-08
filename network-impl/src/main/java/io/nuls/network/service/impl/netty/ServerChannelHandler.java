@@ -53,6 +53,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
+        ctx.channel().close();
         System.out.println("----  service exceptionCaught() ------------");
     }
 
