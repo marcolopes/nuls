@@ -23,10 +23,8 @@
  */
 package io.nuls.network.entity;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author vivi
@@ -39,8 +37,8 @@ public class NodeGroup {
 
     public NodeGroup(String groupName) {
         this.groupName = groupName;
-        nodeMap = new HashMap<>();
-        areaSet = new HashSet<>();
+        nodeMap = new ConcurrentHashMap<>();
+        areaSet = Collections.synchronizedSet(new HashSet<>());
     }
 
     public Map<String, Node> getNodes() {
