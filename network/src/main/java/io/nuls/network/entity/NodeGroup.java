@@ -46,15 +46,19 @@ public class NodeGroup {
     }
 
     public void addNode(Node p) {
-        if (nodeMap.containsKey(p.getIp())) {
+        if (nodeMap.containsKey(p.getId())) {
             return;
         }
-        this.nodeMap.put(p.getIp(), p);
+        this.nodeMap.put(p.getId(), p);
         p.addToGroup(this);
     }
 
     public void removeNode(Node node) {
-        this.nodeMap.remove(node.getIp());
+        this.nodeMap.remove(node.getId());
+    }
+
+    public void removeNode(String nodeId) {
+        this.nodeMap.remove(nodeId);
     }
 
     public int size() {
@@ -62,9 +66,7 @@ public class NodeGroup {
     }
 
     public void removeAll() {
-        for (Node n : nodeMap.values()) {
-            removeNode(n);
-        }
+        nodeMap = new ConcurrentHashMap<>();
     }
 
     @Override

@@ -101,19 +101,10 @@ public class NetworkServiceImpl implements NetworkService {
         TaskManager.shutdownByModuleId(NulsConstant.MODULE_ID_NETWORK);
     }
 
-    @Override
-    public void addNode(Node node) {
-        nodesManager.addNode(node);
-    }
 
     @Override
     public void removeNode(String nodeId) {
         nodesManager.removeNode(nodeId);
-    }
-
-    @Override
-    public boolean containsNode(String nodeId) {
-        return nodesManager.containsNode(nodeId);
     }
 
     @Override
@@ -125,30 +116,6 @@ public class NetworkServiceImpl implements NetworkService {
     public void blackNode(String nodeId, int status) {
 
     }
-
-//    @Override
-//    public void removeNode(String nodeId) {
-//        Node node = nodesManager.getNode(nodeId);
-//        if (node != null) {
-//            node.destroy();
-//            nodesManager.removeNode(nodeId);
-//        }
-//    }
-//
-//    @Override
-//    public boolean containsNode(String nodeId) {
-//
-//        return nodesManager.containsNode(nodeId);
-//    }
-//
-//    @Override
-//    public void blackNode(String nodeId, int status) {
-//        Node node = nodesManager.getNode(nodeId);
-//        if (node != null) {
-//            node.destroy();
-//            nodesManager.blackNode(nodeId, status);
-//        }
-//    }
 
     @Override
     public void addNodeToGroup(String groupName, Node node) {
@@ -162,18 +129,8 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public void removeNodeFromGroup(String groupName, String nodeId) {
-
+        nodesManager.removeNodeFromGroup(groupName, nodeId);
     }
-
-//    @Override
-//    public void addNodeToGroup(String area, String groupName, Node node) {
-//        nodesManager.addNodeToGroup(area, groupName, node);
-//    }
-
-//    @Override
-//    public void removeNodeFromGroup(String groupName, String nodeId) {
-//        nodesManager.removeNodeFromGroup(groupName, nodeId);
-//    }
 
     @Override
     public void removeNodeFromGroup(String area, String groupName, Node node) {

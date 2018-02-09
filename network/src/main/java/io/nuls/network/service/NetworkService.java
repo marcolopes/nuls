@@ -29,8 +29,6 @@ import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 
-import java.nio.ByteBuffer;
-
 /**
  * @author vivi
  * @date 2017/11/21
@@ -43,11 +41,7 @@ public interface NetworkService {
 
     void shutdown();
 
-    void addNode(Node node);
-
     void removeNode(String nodeId);
-
-    boolean containsNode(String nodeId);
 
     Node getNode(String nodeId);
 
@@ -108,7 +102,6 @@ public interface NetworkService {
     BroadcastResult sendToGroup(byte[] data, String groupName, String excludeNodeId);
 
     BroadcastResult sendToGroup(String area, byte[] data, String groupName, String excludeNodeId);
-
 
     void processMessage(Byte[] msg, Node node);
 

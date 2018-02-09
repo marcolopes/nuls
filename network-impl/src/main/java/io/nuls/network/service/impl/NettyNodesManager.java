@@ -35,6 +35,7 @@ import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,7 +107,17 @@ public class NettyNodesManager implements Runnable {
         if (seedNodes == null) {
             seedNodes = discoverHandler.getSeedNodes();
         }
-        return seedNodes;
+        if (nodes.isEmpty()) {
+            return seedNodes;
+        } else {
+            List<Node> nodeList = new ArrayList<>();
+            for (Node node : seedNodes) {
+                if (!nodes.containsKey(node.getId())) {
+                    nodeList.add(node);
+                }
+            }
+            return nodeList;
+        }
     }
 
     public Node getNode(String nodeId) {
@@ -120,8 +131,8 @@ public class NettyNodesManager implements Runnable {
     public void addNode(Node node) {
         lock.lock();
         try {
-            if (!nodes.containsKey(node.getIp())) {
-                nodes.put(node.getIp(), node);
+            if (!nodes.containsKey(node.getId())) {
+                nodes.put(node.getId(), node);
                 if (node.getStatus() == Node.WAIT) {
                     connectionManager.connectionNode(node);
                 }
@@ -136,7 +147,7 @@ public class NettyNodesManager implements Runnable {
             Node node = nodes.get(nodeId);
             node.destroy();
             for (String groupName : node.getGroupSet()) {
-                removeNodeFromGroup(groupName, node);
+                removeNodeFromGroup(groupName, nodeId);
             }
             nodes.remove(nodeId);
             node = null;
@@ -162,12 +173,12 @@ public class NettyNodesManager implements Runnable {
         group.addNode(node);
     }
 
-    public void removeNodeFromGroup(String groupName, Node node) {
+    public void removeNodeFromGroup(String groupName, String nodeId) {
         if (!nodeGroups.containsKey(groupName)) {
             return;
         }
         NodeGroup group = nodeGroups.get(groupName);
-        group.removeNode(node);
+        group.removeNode(nodeId);
     }
 
 
