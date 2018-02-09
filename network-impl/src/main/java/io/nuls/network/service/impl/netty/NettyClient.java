@@ -38,14 +38,17 @@ public class NettyClient {
             if (future.isSuccess()) {
                 socketChannel = (SocketChannel) future.channel();
             } else {
+                System.out.println(41);
                 node.destroy();
             }
             future.channel().closeFuture().sync();
         } catch (Exception e) {
+            e.printStackTrace();
             //maybe time out or something
             if (socketChannel != null) {
                 socketChannel.close();
             }
+            System.out.println(50);
             node.destroy();
         }
     }

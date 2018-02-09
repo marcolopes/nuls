@@ -202,7 +202,8 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public NodeGroup getNodeGroup(String groupName) {
-        return null;
+        //TODO pierre 未实现此方法
+        return nodesManager.getNodeGroup(groupName);
     }
 
     @Override

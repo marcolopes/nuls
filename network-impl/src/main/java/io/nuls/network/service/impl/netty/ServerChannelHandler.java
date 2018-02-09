@@ -22,8 +22,13 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         System.out.println("---------- server  channelRegistered  ------------");
         SocketChannel socketChannel = (SocketChannel) ctx.channel();
-        System.out.println("-------------" + socketChannel.remoteAddress().getHostString());
-        if (getNetworkService().containsNode(socketChannel.remoteAddress().getHostString())) {
+        String remoteIP = socketChannel.remoteAddress().getHostString();
+        System.out.println("-------------" + remoteIP);
+        Node node = getNetworkService().getNode(remoteIP);
+        if (node != null && node.getStatus() == Node.CONNECT) {
+            //TODO pierre 直接关闭了连接, 双方同时对连，连接过程中，client程序加入了remote ip node，
+            //TODO pierre server此处判断就存在了remoteip node
+            System.out.println("Node 状态: " + node.getStatus() + ", Server关闭连接. ");
             ctx.channel().close();
             return;
         }

@@ -132,7 +132,8 @@ public class NettyNodesManager implements Runnable {
     }
 
     public void removeNode(String nodeId) {
-        if (!nodes.containsKey(nodeId)) {
+        //TODO pierre 多了一个非
+        if (nodes.containsKey(nodeId)) {
             nodes.remove(nodeId);
         }
     }
@@ -153,6 +154,7 @@ public class NettyNodesManager implements Runnable {
         }
         node.getGroupSet().add(group.getName());
         addNode(node);
+        //TODO pierre 同一个IP，会在IN和OUT组中各添加一次，是否在所有组里都查询此IP是否存在?
         group.addNode(node);
     }
 
@@ -162,11 +164,13 @@ public class NettyNodesManager implements Runnable {
      */
     @Override
     public void run() {
+        //boolean running = false;
         while (running) {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             for (Node node : nodes.values()) {
                 System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus());
                 if (node.getStatus() == Node.CLOSE) {
+                    System.out.println("remove node: -------------ip:" + node.getIp() + "-------status:" + node.getStatus());
                     for (String groupName : node.getGroupSet()) {
                         NodeGroup group = nodeGroups.get(groupName);
                         if (group != null) {
@@ -177,7 +181,9 @@ public class NettyNodesManager implements Runnable {
                     node = null;
                 }
             }
+            //TODO pierre destroy的node直到nodes为空前不会再连接了吗
             if (nodes.isEmpty()) {
+                System.out.println("重新获取node.");
                 List<Node> nodes = getSeedNodes();
                 for (Node node : nodes) {
                     node.setType(Node.OUT);
@@ -197,5 +203,10 @@ public class NettyNodesManager implements Runnable {
 
     public Map<String, Node> getNodes() {
         return nodes;
+    }
+
+    //TODO pierre 新增方法
+    public NodeGroup getNodeGroup(String groupName) {
+        return nodeGroups.get(groupName);
     }
 }

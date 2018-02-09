@@ -281,6 +281,10 @@ public class Node extends BaseNulsData {
 
     public void destroy() {
         this.lastFailTime = TimeService.currentTimeMillis();
+        System.out.println("pierre destroy");
+        //TODO pierre 如果7 -> 8, 成功连接，7维护一个Out的Node，8维护一个In的Node
+        //TODO        8 -> 7, 失败连接, 8的Node的状态改为CLOSE，在NettyNodesManager的run方法里会remove掉这个node
+        //TODO        如果此时nodes为空，会一直重复8 -> 7的连接
         this.status = Node.CLOSE;
     }
 
