@@ -132,9 +132,14 @@ public class NettyNodesManager implements Runnable {
     }
 
     public void removeNode(String nodeId) {
-        //TODO pierre 多了一个非
         if (nodes.containsKey(nodeId)) {
+            Node node = nodes.get(nodeId);
+            node.destroy();
+            for (String groupName : node.getGroupSet()) {
+                removeNodeFromGroup(groupName, node);
+            }
             nodes.remove(nodeId);
+            node = null;
         }
     }
 
@@ -154,8 +159,15 @@ public class NettyNodesManager implements Runnable {
         }
         node.getGroupSet().add(group.getName());
         addNode(node);
-        //TODO pierre 同一个IP，会在IN和OUT组中各添加一次，是否在所有组里都查询此IP是否存在?
         group.addNode(node);
+    }
+
+    public void removeNodeFromGroup(String groupName, Node node) {
+        if (!nodeGroups.containsKey(groupName)) {
+            return;
+        }
+        NodeGroup group = nodeGroups.get(groupName);
+        group.removeNode(node);
     }
 
 
@@ -168,22 +180,9 @@ public class NettyNodesManager implements Runnable {
         while (running) {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             for (Node node : nodes.values()) {
-                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus());
-                if (node.getStatus() == Node.CLOSE) {
-                    System.out.println("remove node: -------------ip:" + node.getIp() + "-------status:" + node.getStatus());
-                    for (String groupName : node.getGroupSet()) {
-                        NodeGroup group = nodeGroups.get(groupName);
-                        if (group != null) {
-                            group.removeNode(node);
-                        }
-                        nodes.remove(node.getIp());
-                    }
-                    node = null;
-                }
+                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus() + "----------" + node.getType());
             }
-            //TODO pierre destroy的node直到nodes为空前不会再连接了吗
             if (nodes.isEmpty()) {
-                System.out.println("重新获取node.");
                 List<Node> nodes = getSeedNodes();
                 for (Node node : nodes) {
                     node.setType(Node.OUT);

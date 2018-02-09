@@ -7,8 +7,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.nuls.core.utils.log.Log;
+import io.nuls.core.context.NulsContext;
 import io.nuls.network.entity.Node;
+import io.nuls.network.service.NetworkService;
 
 
 public class NettyClient {
@@ -21,6 +22,8 @@ public class NettyClient {
 
     private Node node;
 
+    private NetworkService networkService;
+
     public NettyClient(Node node) {
         this.node = node;
         boot = new Bootstrap();
@@ -29,7 +32,6 @@ public class NettyClient {
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new NulsChannelInitializer<>(new ClientChannelHandler()));
-
     }
 
     public void start() {
@@ -38,26 +40,22 @@ public class NettyClient {
             if (future.isSuccess()) {
                 socketChannel = (SocketChannel) future.channel();
             } else {
-                System.out.println(41);
-                node.destroy();
+                getNetworkService().removeNode(node.getId());
             }
             future.channel().closeFuture().sync();
         } catch (Exception e) {
-            e.printStackTrace();
-            //maybe time out or something
+            //maybe time out or refused or something
             if (socketChannel != null) {
                 socketChannel.close();
             }
-            System.out.println(50);
-            node.destroy();
+            getNetworkService().removeNode(node.getId());
         }
     }
 
-    public static void main(String[] args) {
-        Node node = new Node();
-        node.setIp("192.168.0.144");
-        node.setPort(8003);
-        new NettyClient(node).start();
-
+    private NetworkService getNetworkService() {
+        if (networkService == null) {
+            networkService = NulsContext.getServiceBean(NetworkService.class);
+        }
+        return networkService;
     }
 }
