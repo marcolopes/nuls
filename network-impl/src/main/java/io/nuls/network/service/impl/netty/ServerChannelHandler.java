@@ -40,11 +40,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
                     ctx.channel().close();
                     return;
                 } else {
-                    //本机应作为Server，需remove出站类型的Node，在channelActive中add入站类型的Node
-                    node.destroy();
                     getNetworkService().removeNode(remoteIP);
-                    NodeGroup nodeGroup = getNetworkService().getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-                    nodeGroup.removeNode(node);
                 }
             }
         }
@@ -74,7 +70,7 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
         NioChannelMap.remove(channelId);
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         if (node != null && channelId.equals(node.getChannelId())) {
-            node.destroy();
+            getNetworkService().removeNode(channel.remoteAddress().getHostString());
         }
     }
 

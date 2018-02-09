@@ -36,7 +36,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         NioChannelMap.add(channelId, channel);
         node.setChannelId(channelId);
         node.setStatus(Node.CONNECT);
-        //getNetworkService().addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         if (node != null) {
             if (node.getChannelId() == null || channelId.equals(node.getChannelId())) {
-                node.destroy();
+                getNetworkService().removeNode(node.getId());
             }
         }
     }
