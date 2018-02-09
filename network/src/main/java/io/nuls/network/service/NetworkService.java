@@ -23,6 +23,7 @@
  */
 package io.nuls.network.service;
 
+import io.nuls.core.chain.entity.Result;
 import io.nuls.core.event.BaseEvent;
 import io.nuls.network.entity.BroadcastResult;
 import io.nuls.network.entity.Node;
@@ -43,8 +44,6 @@ public interface NetworkService {
 
     void shutdown();
 
-    void addNode(Node node);
-
     void removeNode(String nodeId);
 
     boolean containsNode(String nodeId);
@@ -53,7 +52,7 @@ public interface NetworkService {
 
     void blackNode(String nodeId, int status);
 
-    void addNodeToGroup(String groupName, Node node);
+    Result addNodeToGroup(String groupName, Node node);
 
     void addNodeToGroup(String area,String groupName,Node node);
 

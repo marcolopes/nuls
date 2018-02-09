@@ -70,7 +70,7 @@ public enum ErrorCode {
     NET_NODE_GROUP_NOT_FOUND("NET008", 40008),
     NET_NODE_AREA_NOT_FOUND("NET009", 40009),
     NET_NODE_NOT_FOUND("NET010", 40010),
-
+    NET_NODE_GROUP_FULL("NET011", 40011),
     /**
      * ---- direct Exception code---
      **/
