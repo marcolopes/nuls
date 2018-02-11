@@ -23,7 +23,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("---------- client  channelActive  ------------");
         String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
 
@@ -40,7 +39,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("---------- client  channelInactive  ------------");
         String channelId = ctx.channel().id().asLongText();
         SocketChannel channel = (SocketChannel) ctx.channel();
         NioChannelMap.remove(channelId);
@@ -54,7 +52,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws UnsupportedEncodingException {
-        System.out.println("---------- client  channelRead  ------------");
         SocketChannel channel = (SocketChannel) ctx.channel();
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         if (node != null && node.isAlive()) {
@@ -71,7 +68,6 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        System.out.println("---------- client  exceptionCaught  ------------");
         cause.printStackTrace();
         ctx.channel().close();
     }
