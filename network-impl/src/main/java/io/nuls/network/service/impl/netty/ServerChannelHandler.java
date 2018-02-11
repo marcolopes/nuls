@@ -14,6 +14,7 @@ import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.service.NetworkService;
 
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 
 @ChannelHandler.Sharable
 public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
@@ -84,12 +85,17 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("----  service channelRead() ------------");
-        String channelId = ctx.channel().id().asLongText();
-        ByteBuf buf = (ByteBuf) msg;
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.readBytes(bytes);
-        String strMsg = new String(bytes, "UTF-8");
-        System.out.println(channelId + ":" + strMsg);
+        SocketChannel channel = (SocketChannel) ctx.channel();
+        Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
+        if (node != null && node.isAlive()) {
+            ByteBuf buf = (ByteBuf) msg;
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.readBytes(bytes);
+            ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+            buffer.put(bytes);
+
+            getNetworkService().receiveMessage(buffer, node);
+        }
     }
 
     private NetworkService getNetworkService() {

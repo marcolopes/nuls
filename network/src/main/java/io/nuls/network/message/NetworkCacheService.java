@@ -52,14 +52,6 @@ public class NetworkCacheService {
         return INSTANCE;
     }
 
-    public void putEvent(BaseEvent event, boolean isPingPong) {
-        if (isPingPong) {
-            cacheService.putElement(PING_EVENT_CACHE, event.getHash().getDigestHex(), event);
-        } else {
-            cacheService.putElement(NETWORK_EVENT_CACHE, event.getHash().getDigestHex(), event);
-        }
-    }
-
     public void putEvent(Object key, BaseEvent event, boolean isPingPong) {
         if (isPingPong) {
             cacheService.putElement(PING_EVENT_CACHE, key, event);
@@ -82,5 +74,4 @@ public class NetworkCacheService {
         }
         return cacheService.containsKey(PING_EVENT_CACHE, key);
     }
-
 }

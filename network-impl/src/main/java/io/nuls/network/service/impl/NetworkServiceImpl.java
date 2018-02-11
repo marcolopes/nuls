@@ -37,13 +37,13 @@ import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 import io.nuls.network.filter.impl.DefaultMessageFilter;
 import io.nuls.network.message.filter.NulsMessageFilter;
-import io.nuls.network.message.impl.GetNodeEventHandler;
-import io.nuls.network.message.impl.NodeEventHandler;
 import io.nuls.network.param.DevNetworkParam;
 import io.nuls.network.param.MainNetworkParam;
 import io.nuls.network.param.TestNetworkParam;
 import io.nuls.network.service.Broadcaster;
 import io.nuls.network.service.NetworkService;
+
+import java.nio.ByteBuffer;
 
 /**
  * @author vivi
@@ -65,9 +65,9 @@ public class NetworkServiceImpl implements NetworkService {
         NulsMessageFilter messageFilter = DefaultMessageFilter.getInstance();
         network.setMessageFilter(messageFilter);
 
-        this.connectionManager = new NettyConnectionManager(network);
+        this.connectionManager = new NettyConnectionManager(network, this);
         this.nodesManager = new NettyNodesManager(network, connectionManager);
-        // this.broadcaster = new BroadcasterImpl(nodesManager, network);
+        this.broadcaster = new BroadcasterImpl(nodesManager, network);
 
 //        GetNodeEventHandler.getInstance().setNodesManager(nodesManager);
 //        NodeEventHandler.getInstance().setNodesManager(nodesManager);
@@ -97,7 +97,7 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public void shutdown() {
-//        connectionManager.serverClose();
+        //todo
         TaskManager.shutdownByModuleId(NulsConstant.MODULE_ID_NETWORK);
     }
 
@@ -114,7 +114,7 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public void blackNode(String nodeId, int status) {
-
+        //todo
     }
 
     @Override
@@ -123,43 +123,22 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public void addNodeToGroup(String area, String groupName, Node node) {
-
-    }
-
-    @Override
     public void removeNodeFromGroup(String groupName, String nodeId) {
         nodesManager.removeNodeFromGroup(groupName, nodeId);
     }
 
     @Override
-    public void removeNodeFromGroup(String area, String groupName, Node node) {
-        removeNodeFromGroup(area, groupName, node);
-    }
-
-    @Override
     public void addNodeGroup(NodeGroup nodeGroup) {
-
+        //todo
     }
 
     @Override
-    public void addNodeGroup(String area, NodeGroup nodeGroup) {
-
+    public void removeNodeGroup(String groupName) {
+        //todo
     }
-
-//    @Override
-//    public void addNodeGroup(NodeGroup nodeGroup) {
-//        nodesManager.addNodeGroup(nodeGroup);
-//    }
-//
-//    @Override
-//    public void addNodeGroup(String areaName, NodeGroup nodeGroup) {
-//        nodesManager.addNodeGroup(areaName, nodeGroup);
-//    }
 
     @Override
     public NodeGroup getNodeGroup(String groupName) {
-        //TODO pierre 未实现此方法
         return nodesManager.getNodeGroup(groupName);
     }
 
@@ -170,108 +149,33 @@ public class NetworkServiceImpl implements NetworkService {
 
 
     @Override
-    public BroadcastResult sendToAllNode(BaseEvent event) {
-        return broadcaster.broadcast(event);
+    public BroadcastResult sendToAllNode(BaseEvent event, boolean asyn) {
+        return broadcaster.broadcast(event, asyn);
     }
 
     @Override
-    public BroadcastResult sendToAllNode(String area, BaseEvent event) {
-        return null;
+    public BroadcastResult sendToAllNode(BaseEvent event, String excludeNodeId, boolean asyn) {
+        return broadcaster.broadcast(event, excludeNodeId, asyn);
     }
 
     @Override
-    public BroadcastResult sendToAllNode(BaseEvent event, String excludeNodeId) {
-        return broadcaster.broadcast(event, excludeNodeId);
+    public BroadcastResult sendToNode(BaseEvent event, String nodeId, boolean asyn) {
+        return broadcaster.broadcastToNode(event, nodeId, asyn);
     }
 
     @Override
-    public BroadcastResult sendToAllNode(String areaName, BaseEvent event, String excludeNodeId) {
-        return null;
+    public BroadcastResult sendToGroup(BaseEvent event, String groupName, boolean asyn) {
+        return broadcaster.broadcastToGroup(event, groupName, asyn);
     }
 
     @Override
-    public BroadcastResult sendToAllNode(byte[] data) {
-        return broadcaster.broadcast(data);
+    public BroadcastResult sendToGroup(BaseEvent event, String groupName, String excludeNodeId, boolean asyn) {
+        return broadcaster.broadcastToGroup(event, groupName, excludeNodeId, asyn);
     }
 
     @Override
-    public BroadcastResult sendToAllNode(String area, byte[] data) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToAllNode(byte[] data, String excludeNodeId) {
-        return broadcaster.broadcast(data, excludeNodeId);
-    }
-
-    @Override
-    public BroadcastResult sendToAllNode(String area, byte[] data, String excludeNodeId) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToNode(BaseEvent event, String nodeId) {
-        return broadcaster.broadcastToNode(event, nodeId);
-    }
-
-    @Override
-    public BroadcastResult sendToNode(String area, BaseEvent event, String nodeId) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToNode(byte[] data, String nodeId) {
-        return broadcaster.broadcastToNode(data, nodeId);
-    }
-
-    @Override
-    public BroadcastResult sendToNode(String area, byte[] data, String nodeId) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(BaseEvent event, String groupName) {
-        return broadcaster.broadcastToGroup(event, groupName);
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(String area, BaseEvent event, String groupName) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(BaseEvent event, String groupName, String excludeNodeId) {
-        return broadcaster.broadcastToGroup(event, groupName, excludeNodeId);
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(String area, BaseEvent event, String groupName, String excludeNodeId) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(byte[] data, String groupName) {
-        return broadcaster.broadcastToGroup(data, groupName);
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(String area, byte[] data, String groupName) {
-        return null;
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(byte[] data, String groupName, String excludeNodeId) {
-        return broadcaster.broadcastToGroup(data, groupName, excludeNodeId);
-    }
-
-    @Override
-    public BroadcastResult sendToGroup(String area, byte[] data, String groupName, String excludeNodeId) {
-        return null;
-    }
-
-    @Override
-    public void processMessage(Byte[] msg, Node node) {
-        connectionManager.processMessage(msg, node);
+    public void receiveMessage(ByteBuffer buffer, Node node) {
+        connectionManager.receiveMessage(buffer, node);
     }
 
     private AbstractNetworkParam getNetworkInstance() {

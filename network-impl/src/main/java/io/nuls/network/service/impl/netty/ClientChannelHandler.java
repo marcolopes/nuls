@@ -55,12 +55,17 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws UnsupportedEncodingException {
         System.out.println("---------- client  channelRead  ------------");
-        String channelId = ctx.channel().id().asLongText();
-        ByteBuf buf = (ByteBuf) msg;
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.readBytes(bytes);
-        ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
-        buffer.put(bytes);
+        SocketChannel channel = (SocketChannel) ctx.channel();
+        Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
+        if (node != null && node.isAlive()) {
+            ByteBuf buf = (ByteBuf) msg;
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.readBytes(bytes);
+            ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+            buffer.put(bytes);
+
+            getNetworkService().receiveMessage(buffer, node);
+        }
     }
 
     @Override

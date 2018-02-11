@@ -100,7 +100,7 @@ public class NettyNodesManager implements Runnable {
             addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
         }
         running = true;
-        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "connectionManager", this);
+        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "NetworkNodeManager", this);
     }
 
     public List<Node> getSeedNodes() {
@@ -181,17 +181,15 @@ public class NettyNodesManager implements Runnable {
         group.removeNode(nodeId);
     }
 
-
     /**
      * check connecting node enough
      */
     @Override
     public void run() {
-        //boolean running = false;
         while (running) {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             for (Node node : nodes.values()) {
-                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus() + "----------" + node.getType());
+                System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus() + "----------type:" + node.getType());
             }
             if (nodes.isEmpty()) {
                 List<Node> nodes = getSeedNodes();
@@ -201,10 +199,8 @@ public class NettyNodesManager implements Runnable {
                     addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
                 }
             }
-            System.out.println("------------华丽的分割线----------------");
-
             try {
-                Thread.sleep(7000);
+                Thread.sleep(6000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -215,7 +211,6 @@ public class NettyNodesManager implements Runnable {
         return nodes;
     }
 
-    //TODO pierre 新增方法
     public NodeGroup getNodeGroup(String groupName) {
         return nodeGroups.get(groupName);
     }

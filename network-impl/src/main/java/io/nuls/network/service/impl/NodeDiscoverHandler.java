@@ -23,11 +23,15 @@
  */
 package io.nuls.network.service.impl;
 
+import io.nuls.core.constant.NulsConstant;
+import io.nuls.core.thread.manager.TaskManager;
 import io.nuls.db.dao.NodeDataService;
 import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
+import io.nuls.network.message.entity.PingEvent;
+import io.nuls.network.service.Broadcaster;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -43,6 +47,8 @@ public class NodeDiscoverHandler implements Runnable {
 
     private NettyNodesManager nodesManager;
 
+    private Broadcaster broadcaster;
+
     private NodeDataService nodeDao;
 
     private boolean running;
@@ -53,6 +59,12 @@ public class NodeDiscoverHandler implements Runnable {
         this.network = network;
         this.running = true;
         this.nodeDao = nodeDao;
+        this.broadcaster = new BroadcasterImpl(nodesManager, network);
+    }
+
+    public void start() {
+        running = true;
+        TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "NetworkNodeDiscover", this);
     }
 
 //    // get nodes from local database
@@ -90,7 +102,20 @@ public class NodeDiscoverHandler implements Runnable {
      */
     @Override
     public void run() {
-
+        while (running) {
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            for (Node node : nodesManager.getNodes().values()) {
+                if (node.isAlive()) {
+                    PingEvent event = new PingEvent();
+                    broadcaster.broadcastToNode(event, node, true);
+                }
+            }
+            try {
+                Thread.sleep(6000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

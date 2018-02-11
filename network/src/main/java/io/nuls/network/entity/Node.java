@@ -46,6 +46,7 @@ import java.net.InetSocketAddress;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -95,9 +96,6 @@ public class Node extends BaseNulsData {
 
     private VersionEvent versionMessage;
 
-    private Lock lock = new ReentrantLock();
-
-
     private NetworkEventHandlerFactory messageHandlerFactory;
 
     public Node() {
@@ -107,7 +105,7 @@ public class Node extends BaseNulsData {
     public Node(AbstractNetworkParam network) {
         this();
         this.magicNumber = network.packetMagic();
-        this.groupSet = new HashSet<>();
+        this.groupSet = new ConcurrentHashMap<>().newKeySet();
     }
 
     public Node(AbstractNetworkParam network, int type) {
@@ -312,7 +310,6 @@ public class Node extends BaseNulsData {
         magicNumber = (int) buffer.readVarInt();
         port = (int) buffer.readVarInt();
         ip = new String(buffer.readByLengthByte());
-        //  eventBusService = NulsContext.getServiceBean(EventBusService.class);
     }
 
 
@@ -328,6 +325,10 @@ public class Node extends BaseNulsData {
 
     public boolean isHandShake() {
         return this.status == Node.HANDSHAKE;
+    }
+
+    public boolean isAlive() {
+        return this.status == Node.CONNECT || status == Node.HANDSHAKE;
     }
 
     private boolean isNetworkEvent(BaseEvent event) {
