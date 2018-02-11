@@ -65,7 +65,7 @@ public class NettyConnectionManager {
     public void init() {
         nettyServer = new NettyServer(network.port());
         nettyServer.init();
-        eventBusService = NulsContext.getServiceBean(EventBusService.class);
+//        eventBusService = NulsContext.getServiceBean(EventBusService.class);
         messageHandlerFactory = network.getMessageHandlerFactory();
     }
 

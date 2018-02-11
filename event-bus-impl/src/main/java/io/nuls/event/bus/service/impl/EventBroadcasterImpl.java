@@ -51,7 +51,7 @@ public class EventBroadcasterImpl implements EventBroadcaster {
 
     @Override
     public List<String> broadcastHashAndCache(BaseEvent event, boolean needToSelf) {
-        BroadcastResult result = this.networkService.sendToAllNode(new CommonDigestEvent(event.getHash()));
+        BroadcastResult result = this.networkService.sendToAllNode(new CommonDigestEvent(event.getHash()), true);
         if (needToSelf) {
             eventBusService.publishLocalEvent(event);
         }
@@ -63,7 +63,7 @@ public class EventBroadcasterImpl implements EventBroadcaster {
 
     @Override
     public List<String> broadcastHashAndCache(BaseEvent event, boolean needToSelf, String excludeNodeId) {
-        BroadcastResult result = this.networkService.sendToAllNode(new CommonDigestEvent(event.getHash()), excludeNodeId);
+        BroadcastResult result = this.networkService.sendToAllNode(new CommonDigestEvent(event.getHash()), excludeNodeId, true);
         if (needToSelf) {
             eventBusService.publishLocalEvent(event);
         }
@@ -87,7 +87,7 @@ public class EventBroadcasterImpl implements EventBroadcaster {
 
     @Override
     public List<String> broadcastAndCache(BaseEvent event, boolean needToSelf, String excludeNodeId) {
-        BroadcastResult result = networkService.sendToAllNode(event, excludeNodeId);
+        BroadcastResult result = networkService.sendToAllNode(event, excludeNodeId, true);
         if (needToSelf) {
             eventBusService.publishLocalEvent(event);
         }
@@ -99,7 +99,7 @@ public class EventBroadcasterImpl implements EventBroadcaster {
 
     @Override
     public List<String> broadcastAndCache(BaseEvent event, boolean needToSelf) {
-        BroadcastResult result = networkService.sendToAllNode(event);
+        BroadcastResult result = networkService.sendToAllNode(event, true);
         if (needToSelf) {
             eventBusService.publishLocalEvent(event);
         }
@@ -111,7 +111,7 @@ public class EventBroadcasterImpl implements EventBroadcaster {
 
     @Override
     public boolean sendToNode(BaseEvent event, String nodeId) {
-        BroadcastResult result = networkService.sendToNode(event, nodeId);
+        BroadcastResult result = networkService.sendToNode(event, nodeId, true);
         return result.isSuccess();
     }
 
