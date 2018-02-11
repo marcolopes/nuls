@@ -363,7 +363,7 @@ public class BroadcasterImpl implements Broadcaster {
             if (channel == null) {
                 return new BroadcastResult(false, "node not found");
             }
-            ChannelFuture future = channel.writeAndFlush(Unpooled.copiedBuffer(message.serialize()));
+            ChannelFuture future = channel.writeAndFlush(Unpooled.wrappedBuffer(message.serialize()));
             if (!asyn) {
                 boolean success = future.isSuccess();
                 if (!success) {
