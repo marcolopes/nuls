@@ -1,10 +1,9 @@
 package io.nuls.notify.smc;
 
-import io.nuls.notify.entity.SubscriberDO;
 import org.java_websocket.WebSocket;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author daviyang35
@@ -12,45 +11,30 @@ import java.util.Map;
  * Subscription Management Controller
  */
 public class SMController {
-    private Map<Integer, SubscriberDO> subscriberMap;
+    private List<WebSocket> subscriberArray;
 
     public SMController() {
-        subscriberMap = new HashMap<>(4);
+        subscriberArray = new ArrayList<>(4);
     }
 
     public void addSubscriber(WebSocket sock) {
-        SubscriberDO subscriberDO = new SubscriberDO(sock);
-        Integer key = subscriberDO.getSubscriberHash();
-        if (!subscriberMap.containsKey(key)) {
-            subscriberMap.put(key, subscriberDO);
-        } else {
-            // What happen!
-            WebSocket socket = (WebSocket)subscriberMap.get(key);
-            socket.close();
-            subscriberMap.remove(key);
-        }
+        subscriberArray.add(sock);
     }
 
     public void removeSubscriber(WebSocket sock) {
-        Integer key = SubscriberDO.genericHash(sock);
-        if (subscriberMap.containsKey(key)) {
-            subscriberMap.remove(key);
-        }
+        subscriberArray.remove(sock);
     }
 
     public void handleSubscriberMsg(WebSocket sock, String msg) {
-        Integer key = SubscriberDO.genericHash(sock);
-        if (!subscriberMap.containsKey(key)) {
-            return;
-        }
-
-        SubscriberDO subscriberDO = subscriberMap.get(key);
-
         // decode Json Object
+        // nop
     }
 
     public void removeAllSubscriber() {
-
+        for (WebSocket client : subscriberArray) {
+            client.close();
+        }
+        subscriberArray.clear();
     }
 
     private void process() {

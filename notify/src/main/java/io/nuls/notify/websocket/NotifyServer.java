@@ -43,7 +43,7 @@ public class NotifyServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         if (smController != null) {
-            smController.handleSubscriberMsg(webSocket,s);
+            smController.handleSubscriberMsg(webSocket, s);
         }
     }
 
