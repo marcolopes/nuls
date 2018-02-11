@@ -23,7 +23,6 @@ public class NulsChannelInitializer<T extends ChannelInboundHandlerAdapter> exte
         ChannelPipeline p = socketChannel.pipeline();
         p.addLast("decoder", new LengthFieldBasedFrameDecoder(10 * 1024 * 1024, 0, 8, 0, 8));
         p.addLast("encoder0", new LengthFieldPrepender(8, false));
-        p.addLast("encoder1", new StringEncoder(Charset.forName("UTF-8")));
         p.addLast(t);
     }
 }

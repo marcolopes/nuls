@@ -23,6 +23,8 @@
  */
 package io.nuls.network.service.impl;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.SocketChannel;
 import io.nuls.core.event.BaseEvent;
@@ -361,7 +363,7 @@ public class BroadcasterImpl implements Broadcaster {
             if (channel == null) {
                 return new BroadcastResult(false, "node not found");
             }
-            ChannelFuture future = channel.writeAndFlush(message.serialize());
+            ChannelFuture future = channel.writeAndFlush(Unpooled.copiedBuffer(message.serialize()));
             if (!asyn) {
                 boolean success = future.isSuccess();
                 if (!success) {
