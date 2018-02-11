@@ -58,7 +58,7 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
         GetVersionEvent event = (GetVersionEvent) networkEvent;
         String key = event.getHeader().getEventType() + "-" + node.getId();
         if (cacheService.existEvent(key)) {
-            node.destroy();
+            //todo
             return null;
         }
         cacheService.putEvent(key, event, true);
@@ -66,7 +66,7 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
         Block block = NulsContext.getInstance().getBestBlock();
         VersionEvent replyMessage;
         if (block == null) {
-            replyMessage = new VersionEvent(0, "");
+            replyMessage = new VersionEvent(0, "T");
         } else {
             replyMessage = new VersionEvent(block.getHeader().getHeight(), block.getHeader().getHash().getDigestHex());
         }
