@@ -101,6 +101,7 @@ public class NettyNodesManager implements Runnable {
         }
         running = true;
         TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "NetworkNodeManager", this);
+        discoverHandler.start();
     }
 
     public List<Node> getSeedNodes() {
