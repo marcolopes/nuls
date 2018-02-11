@@ -26,11 +26,9 @@ package io.nuls.network.service.impl;
 import io.nuls.core.constant.NulsConstant;
 import io.nuls.core.thread.manager.TaskManager;
 import io.nuls.db.dao.NodeDataService;
-import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
-import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
-import io.nuls.network.message.entity.PingEvent;
+import io.nuls.network.message.entity.GetVersionEvent;
 import io.nuls.network.service.Broadcaster;
 
 import java.net.InetSocketAddress;
@@ -106,7 +104,7 @@ public class NodeDiscoverHandler implements Runnable {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             for (Node node : nodesManager.getNodes().values()) {
                 if (node.isAlive()) {
-                    PingEvent event = new PingEvent();
+                    GetVersionEvent event = new GetVersionEvent();
                     broadcaster.broadcastToNode(event, node, true);
                 }
             }
