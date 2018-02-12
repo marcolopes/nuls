@@ -149,13 +149,13 @@ public class NettyNodesManager implements Runnable {
         if (nodes.containsKey(nodeId)) {
             Node node = nodes.get(nodeId);
             //When other modules call the interface,  close channel first
-//            if (StringUtils.isNotBlank(node.getChannelId())) {
-//                SocketChannel channel = NioChannelMap.get(node.getChannelId());
-//                if (channel != null) {
-//                    channel.close();
-//                }
-//                return;
-//            }
+            if (StringUtils.isNotBlank(node.getChannelId())) {
+                SocketChannel channel = NioChannelMap.get(node.getChannelId());
+                if (channel != null) {
+                    channel.close();
+                    return;
+                }
+        }
 
             node.destroy();
             for (String groupName : node.getGroupSet()) {

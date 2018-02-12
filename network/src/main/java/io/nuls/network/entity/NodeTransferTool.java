@@ -35,6 +35,7 @@ public class NodeTransferTool {
 
 
     public static void toNode(Node node, NodePo po) {
+        node.setId(po.getId());
         node.setFailCount(po.getFailCount());
         node.setIp(po.getIp());
         node.setPort(po.getPort());
@@ -47,6 +48,7 @@ public class NodeTransferTool {
 
     public static NodePo toPojo(Node node) {
         NodePo po = new NodePo();
+        po.setId(node.getId());
         po.setFailCount(node.getFailCount());
         po.setIp(node.getIp());
         po.setPort(node.getPort());
