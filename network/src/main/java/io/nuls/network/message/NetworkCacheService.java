@@ -44,7 +44,7 @@ public class NetworkCacheService {
 
     private NetworkCacheService() {
         this.cacheService = NulsContext .getServiceBean(CacheService.class);
-        this.cacheService.createCache(PING_EVENT_CACHE,5, 5, 0);
+        this.cacheService.createCache(PING_EVENT_CACHE,5, 6, 0);
         this.cacheService.createCache(NETWORK_EVENT_CACHE,10, 60, 0);
     }
 
