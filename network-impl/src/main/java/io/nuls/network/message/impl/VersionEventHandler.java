@@ -66,7 +66,7 @@ public class VersionEventHandler implements NetWorkEventHandler {
 
         String key = event.getHeader().getEventType() + "-" + node.getId();
         if (cacheService.existEvent(key)) {
-            Log.debug("----------VersionEventHandler  cacheService  existEvent--------");
+            Log.info("----------VersionEventHandler  cacheService  existEvent--------");
             getNetworkService().removeNode(node.getId());
             return null;
         }
