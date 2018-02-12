@@ -27,6 +27,7 @@ import io.nuls.core.constant.ErrorCode;
 import io.nuls.core.context.NulsContext;
 import io.nuls.core.event.BaseEvent;
 import io.nuls.core.utils.date.TimeService;
+import io.nuls.core.utils.log.Log;
 import io.nuls.db.dao.NodeDataService;
 import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeTransferTool;
@@ -65,6 +66,7 @@ public class VersionEventHandler implements NetWorkEventHandler {
 
         String key = event.getHeader().getEventType() + "-" + node.getId();
         if (cacheService.existEvent(key)) {
+            Log.debug("----------VersionEventHandler  cacheService  existEvent--------");
             getNetworkService().removeNode(node.getId());
             return null;
         }
