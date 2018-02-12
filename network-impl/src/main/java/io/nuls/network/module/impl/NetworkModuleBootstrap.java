@@ -66,8 +66,6 @@ public class NetworkModuleBootstrap extends AbstractNetworkModule {
         EventManager.putEvent(VersionEvent.class);
         EventManager.putEvent(GetNodeEvent.class);
         EventManager.putEvent(NodeEvent.class);
-        EventManager.putEvent(PingEvent.class);
-        EventManager.putEvent(PongEvent.class);
     }
 
     @Override

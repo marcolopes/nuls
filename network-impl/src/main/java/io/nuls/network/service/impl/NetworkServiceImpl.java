@@ -40,7 +40,6 @@ import io.nuls.network.message.filter.NulsMessageFilter;
 import io.nuls.network.param.DevNetworkParam;
 import io.nuls.network.param.MainNetworkParam;
 import io.nuls.network.param.TestNetworkParam;
-import io.nuls.network.service.Broadcaster;
 import io.nuls.network.service.NetworkService;
 
 import java.nio.ByteBuffer;
@@ -57,21 +56,29 @@ public class NetworkServiceImpl implements NetworkService {
 
     private NettyNodesManager nodesManager;
 
-    private Broadcaster broadcaster;
-
+    private BroadcastHandler broadcaster;
 
     public NetworkServiceImpl() {
         this.network = getNetworkInstance();
         NulsMessageFilter messageFilter = DefaultMessageFilter.getInstance();
         network.setMessageFilter(messageFilter);
 
-        this.connectionManager = new NettyConnectionManager(network, this);
-        this.nodesManager = new NettyNodesManager(network, connectionManager);
-        this.broadcaster = new BroadcasterImpl(nodesManager, network);
+        this.connectionManager = NettyConnectionManager.getInstance();
+        connectionManager.setNetwork(network);
+        connectionManager.setNetworkService(this);
 
-//        GetNodeEventHandler.getInstance().setNodesManager(nodesManager);
-//        NodeEventHandler.getInstance().setNodesManager(nodesManager);
+        this.nodesManager = NettyNodesManager.getInstance();
+        nodesManager.setNetwork(network);
+        nodesManager.setConnectionManager(connectionManager);
 
+        this.broadcaster = BroadcastHandler.getInstance();
+        broadcaster.setNetwork(network);
+        broadcaster.setNodesManager(nodesManager);
+
+        NodeDiscoverHandler discoverHandler = NodeDiscoverHandler.getInstance();
+        discoverHandler.setNetwork(network);
+        discoverHandler.setNodesManager(nodesManager);
+        nodesManager.setDiscoverHandler(discoverHandler);
     }
 
     @Override

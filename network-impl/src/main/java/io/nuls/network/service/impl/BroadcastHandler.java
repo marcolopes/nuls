@@ -23,7 +23,6 @@
  */
 package io.nuls.network.service.impl;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.SocketChannel;
@@ -33,7 +32,6 @@ import io.nuls.network.entity.BroadcastResult;
 import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
-import io.nuls.network.service.Broadcaster;
 import io.nuls.network.service.impl.netty.NioChannelMap;
 
 import java.io.IOException;
@@ -43,18 +41,21 @@ import java.util.Map;
  * @author vivi
  * @date 2017/11/29.
  */
-public class BroadcasterImpl implements Broadcaster {
+public class BroadcastHandler {
 
     private NettyNodesManager nodesManager;
 
     private AbstractNetworkParam network;
 
-    public BroadcasterImpl(NettyNodesManager nodesManager, AbstractNetworkParam network) {
-        this.nodesManager = nodesManager;
-        this.network = network;
+    private static BroadcastHandler instance = new BroadcastHandler();
+
+    private BroadcastHandler() {
     }
 
-    @Override
+    public static BroadcastHandler getInstance() {
+        return instance;
+    }
+
     public BroadcastResult broadcast(BaseEvent event, boolean asyn) {
         if (nodesManager.getNodes().isEmpty()) {
             return new BroadcastResult(false, "no node can be broadcast");
@@ -62,7 +63,6 @@ public class BroadcasterImpl implements Broadcaster {
         return broadcastToList(nodesManager.getNodes(), event, null, asyn);
     }
 
-    @Override
     public BroadcastResult broadcast(BaseEvent event, String excludeNodeId, boolean asyn) {
         if (nodesManager.getNodes().isEmpty()) {
             return new BroadcastResult(false, "no node can be broadcast");
@@ -70,7 +70,6 @@ public class BroadcasterImpl implements Broadcaster {
         return broadcastToList(nodesManager.getNodes(), event, excludeNodeId, asyn);
     }
 
-    @Override
     public BroadcastResult broadcastToGroup(BaseEvent event, String groupName, boolean asyn) {
         NodeGroup group = nodesManager.getNodeGroup(groupName);
         if (group == null) {
@@ -83,7 +82,6 @@ public class BroadcasterImpl implements Broadcaster {
         return broadcastToList(group.getNodes(), event, null, asyn);
     }
 
-    @Override
     public BroadcastResult broadcastToGroup(BaseEvent event, String groupName, String excludeNodeId, boolean asyn) {
         NodeGroup group = nodesManager.getNodeGroup(groupName);
         if (group == null) {
@@ -96,7 +94,6 @@ public class BroadcasterImpl implements Broadcaster {
         return broadcastToList(group.getNodes(), event, excludeNodeId, asyn);
     }
 
-    @Override
     public BroadcastResult broadcastToNode(BaseEvent event, String nodeId, boolean asyn) {
         try {
             NulsMessage message = new NulsMessage(network.packetMagic(), event.serialize());
@@ -110,7 +107,6 @@ public class BroadcasterImpl implements Broadcaster {
         }
     }
 
-    @Override
     public BroadcastResult broadcastToNode(BaseEvent event, Node node, boolean asyn) {
         try {
             NulsMessage message = new NulsMessage(network.packetMagic(), event.serialize());
@@ -376,5 +372,13 @@ public class BroadcasterImpl implements Broadcaster {
             return new BroadcastResult(false, "send message failed");
         }
         return new BroadcastResult(true, "OK");
+    }
+
+    public void setNetwork(AbstractNetworkParam network) {
+        this.network = network;
+    }
+
+    public void setNodesManager(NettyNodesManager nodesManager) {
+        this.nodesManager = nodesManager;
     }
 }

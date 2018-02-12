@@ -24,16 +24,23 @@
 package io.nuls.network.service.impl;
 
 import io.nuls.core.constant.NulsConstant;
+import io.nuls.core.context.NulsContext;
 import io.nuls.core.thread.manager.TaskManager;
 import io.nuls.db.dao.NodeDataService;
+import io.nuls.db.entity.NodePo;
+import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
+import io.nuls.network.entity.NodeGroup;
+import io.nuls.network.entity.NodeTransferTool;
 import io.nuls.network.entity.param.AbstractNetworkParam;
+import io.nuls.network.message.entity.GetNodeEvent;
 import io.nuls.network.message.entity.GetVersionEvent;
-import io.nuls.network.service.Broadcaster;
+import io.nuls.network.service.NetworkService;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author vivi
@@ -45,19 +52,20 @@ public class NodeDiscoverHandler implements Runnable {
 
     private NettyNodesManager nodesManager;
 
-    private Broadcaster broadcaster;
-
     private NodeDataService nodeDao;
+
+    private BroadcastHandler broadcaster;
 
     private boolean running;
 
+    private NodeDiscoverHandler() {
 
-    public NodeDiscoverHandler(NettyNodesManager nodesManager, AbstractNetworkParam network, NodeDataService nodeDao) {
-        this.nodesManager = nodesManager;
-        this.network = network;
-        this.running = true;
-        this.nodeDao = nodeDao;
-        this.broadcaster = new BroadcasterImpl(nodesManager, network);
+    }
+
+    private static NodeDiscoverHandler instance = new NodeDiscoverHandler();
+
+    public static NodeDiscoverHandler getInstance() {
+        return instance;
     }
 
     public void start() {
@@ -65,22 +73,22 @@ public class NodeDiscoverHandler implements Runnable {
         TaskManager.createAndRunThread(NulsConstant.MODULE_ID_NETWORK, "NetworkNodeDiscover", this);
     }
 
-//    // get nodes from local database
-//    public List<Node> getLocalNodes(int size) {
-//        Set<String> keys = nodesManager.getNodes().keySet();
-//        List<NodePo> nodePos = nodeDao.getRandomNodePoList(size, keys);
-//
-//        List<Node> nodes = new ArrayList<>();
-//        if (nodePos == null || nodePos.isEmpty()) {
-//            return nodes;
-//        }
-//        for (NodePo po : nodePos) {
-//            Node node = new Node(network);
-//            NodeTransferTool.toNode(node, po);
-//            nodes.add(node);
-//        }
-//        return nodes;
-//    }
+    // get nodes from local database
+    public List<Node> getLocalNodes(int size) {
+        Set<String> keys = nodesManager.getNodes().keySet();
+        List<NodePo> nodePos = getNodeDao().getNodePoList(size, keys);
+
+        List<Node> nodes = new ArrayList<>();
+        if (nodePos == null || nodePos.isEmpty()) {
+            return nodes;
+        }
+        for (NodePo po : nodePos) {
+            Node node = new Node(network);
+            NodeTransferTool.toNode(node, po);
+            nodes.add(node);
+        }
+        return nodes;
+    }
 
 
     public List<Node> getSeedNodes() {
@@ -93,6 +101,40 @@ public class NodeDiscoverHandler implements Runnable {
             seedNodes.add(new Node(network, Node.OUT, socketAddress));
         }
         return seedNodes;
+    }
+
+    /**
+     * Inquire more of the other nodes to the connected nodes
+     *
+     * @param size
+     */
+    private void findOtherNode(int size) {
+        NodeGroup group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_IN_GROUP);
+        if (group.getNodes().size() > 0) {
+            Node node = group.getNodes().get(0);
+            if (node.isHandShake()) {
+                try {
+                    GetNodeEvent event = new GetNodeEvent(size);
+                    broadcaster.broadcastToNode(event, node, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+//
+//        group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
+//        if (group.getNodes().size() > 0) {
+//            Node node = group.getNodes().get(0);
+//            if (node.isHandShake()) {
+//                try {
+//                    GetNodeEvent data = new GetNodeEvent(size);
+//                    node.sendNetworkData(data);
+//                } catch (Exception e) {
+//                    Log.warn("send getNodeData error", e);
+//                    node.destroy();
+//                }
+//            }
+//        }
     }
 
     /**
@@ -116,38 +158,22 @@ public class NodeDiscoverHandler implements Runnable {
         }
     }
 
-    /**
-     * Inquire more of the other nodes to the connected nodes
-     *
-     * @param size
-     */
-    private void findOtherNode(int size) {
-//        NodeGroup group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_IN_GROUP);
-//        if (group.getNodes().size() > 0) {
-//            Node node = group.getNodes().get(0);
-//            if (node.isHandShake()) {
-//                try {
-//                    GetNodeEvent data = new GetNodeEvent(size);
-//                    node.sendNetworkData(data);
-//                } catch (Exception e) {
-//                    Log.warn("send getNodeData error", e);
-//                    node.destroy();
-//                }
-//            }
-//        }
-//
-//        group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-//        if (group.getNodes().size() > 0) {
-//            Node node = group.getNodes().get(0);
-//            if (node.isHandShake()) {
-//                try {
-//                    GetNodeEvent data = new GetNodeEvent(size);
-//                    node.sendNetworkData(data);
-//                } catch (Exception e) {
-//                    Log.warn("send getNodeData error", e);
-//                    node.destroy();
-//                }
-//            }
-//        }
+    public void setNetwork(AbstractNetworkParam network) {
+        this.network = network;
+    }
+
+    public void setNodesManager(NettyNodesManager nodesManager) {
+        this.nodesManager = nodesManager;
+    }
+
+    public void setBroadcaster(BroadcastHandler broadcaster) {
+        this.broadcaster = broadcaster;
+    }
+
+    private NodeDataService getNodeDao() {
+        if (nodeDao == null) {
+            nodeDao = NulsContext.getServiceBean(NodeDataService.class);
+        }
+        return nodeDao;
     }
 }

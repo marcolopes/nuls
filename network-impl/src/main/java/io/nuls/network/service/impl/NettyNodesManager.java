@@ -23,7 +23,6 @@
  */
 package io.nuls.network.service.impl;
 
-
 import io.netty.channel.socket.SocketChannel;
 import io.nuls.consensus.constant.PocConsensusConstant;
 import io.nuls.core.constant.ErrorCode;
@@ -66,22 +65,26 @@ public class NettyNodesManager implements Runnable {
 
     private boolean running;
 
-    public NettyNodesManager(AbstractNetworkParam network, NettyConnectionManager connectionManager) {
-        this.network = network;
-        this.connectionManager = connectionManager;
-        // init default NodeGroup
-        NodeGroup inNodes = new NodeGroup(NetworkConstant.NETWORK_NODE_IN_GROUP);
-        NodeGroup outNodes = new NodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-        nodeGroups.put(inNodes.getName(), inNodes);
-        nodeGroups.put(outNodes.getName(), outNodes);
+    private static NettyNodesManager instance = new NettyNodesManager();
 
-        discoverHandler = new NodeDiscoverHandler(this, network, null);
+    private NettyNodesManager() {
+    }
+
+    public static NettyNodesManager getInstance() {
+        return instance;
     }
 
     /**
      * Check if is a consensus node，add consensusNodeGroup
      */
     public void init() {
+
+        // init default NodeGroup
+        NodeGroup inNodes = new NodeGroup(NetworkConstant.NETWORK_NODE_IN_GROUP);
+        NodeGroup outNodes = new NodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
+        nodeGroups.put(inNodes.getName(), inNodes);
+        nodeGroups.put(outNodes.getName(), outNodes);
+
         boolean isConsensus = NulsContext.MODULES_CONFIG.getCfgValue(PocConsensusConstant.CFG_CONSENSUS_SECTION, PocConsensusConstant.PROPERTY_PARTAKE_PACKING, false);
         if (isConsensus) {
             NodeGroup consensusNodes = new NodeGroup(NetworkConstant.NETWORK_NODE_CONSENSUS_GROUP);
@@ -126,10 +129,6 @@ public class NettyNodesManager implements Runnable {
 
     public Node getNode(String nodeId) {
         return nodes.get(nodeId);
-    }
-
-    public boolean containsNode(String nodeId) {
-        return nodes.containsKey(nodeId);
     }
 
     public void addNode(Node node) {
@@ -205,6 +204,7 @@ public class NettyNodesManager implements Runnable {
             for (Node node : nodes.values()) {
                 System.out.println("-------------ip:" + node.getIp() + "-------status:" + node.getStatus() + "----------type:" + node.getType());
             }
+
             if (nodes.isEmpty()) {
                 List<Node> nodes = getSeedNodes();
                 for (Node node : nodes) {
@@ -213,6 +213,20 @@ public class NettyNodesManager implements Runnable {
                     addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
                 }
             }
+
+//            NodeGroup group = nodeGroups.get(NetworkConstant.NETWORK_NODE_OUT_GROUP);
+//            if (group.size() < network.maxOutCount()) {
+//                List<Node> nodes = discoverHandler.getLocalNodes(network.maxOutCount() - group.size());
+//                if (!nodes.isEmpty()) {
+//                    for (Node node : nodes) {
+//                        node.setType(Node.OUT);
+//                        node.setStatus(Node.WAIT);
+//                        addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
+//                    }
+//                } else {
+//
+//                }
+//            }
             try {
                 Thread.sleep(6000);
             } catch (InterruptedException e) {
@@ -227,5 +241,17 @@ public class NettyNodesManager implements Runnable {
 
     public NodeGroup getNodeGroup(String groupName) {
         return nodeGroups.get(groupName);
+    }
+
+    public void setNetwork(AbstractNetworkParam network) {
+        this.network = network;
+    }
+
+    public void setConnectionManager(NettyConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
+
+    public void setDiscoverHandler(NodeDiscoverHandler discoverHandler) {
+        this.discoverHandler = discoverHandler;
     }
 }

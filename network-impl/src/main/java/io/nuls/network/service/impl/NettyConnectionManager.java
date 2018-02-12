@@ -56,10 +56,12 @@ public class NettyConnectionManager {
     private EventBusService eventBusService;
     private NetworkEventHandlerFactory messageHandlerFactory;
 
+    private static NettyConnectionManager instance = new NettyConnectionManager();
 
-    public NettyConnectionManager(AbstractNetworkParam network, NetworkService networkService) {
-        this.network = network;
-        this.networkService = networkService;
+    private NettyConnectionManager() {}
+
+    public static NettyConnectionManager getInstance() {
+        return instance;
     }
 
     public void init() {
@@ -160,4 +162,13 @@ public class NettyConnectionManager {
         }
         return false;
     }
+
+    public void setNetwork(AbstractNetworkParam network) {
+        this.network = network;
+    }
+
+    public void setNetworkService(NetworkService networkService) {
+        this.networkService = networkService;
+    }
+
 }
