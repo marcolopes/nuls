@@ -78,6 +78,7 @@ public class NetworkServiceImpl implements NetworkService {
         NodeDiscoverHandler discoverHandler = NodeDiscoverHandler.getInstance();
         discoverHandler.setNetwork(network);
         discoverHandler.setNodesManager(nodesManager);
+        discoverHandler.setBroadcaster(broadcaster);
         nodesManager.setDiscoverHandler(discoverHandler);
     }
 
