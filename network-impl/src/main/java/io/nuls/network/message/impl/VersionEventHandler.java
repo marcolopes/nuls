@@ -35,6 +35,7 @@ import io.nuls.network.message.NetworkCacheService;
 import io.nuls.network.message.NetworkEventResult;
 import io.nuls.network.message.entity.VersionEvent;
 import io.nuls.network.message.handler.NetWorkEventHandler;
+import io.nuls.network.service.NetworkService;
 
 /**
  * @author vivi
@@ -47,6 +48,8 @@ public class VersionEventHandler implements NetWorkEventHandler {
     private NodeDataService nodeDao;
 
     private NetworkCacheService cacheService;
+
+    private NetworkService networkService;
 
     private VersionEventHandler() {
         cacheService = NetworkCacheService.getInstance();
@@ -62,7 +65,7 @@ public class VersionEventHandler implements NetWorkEventHandler {
 
         String key = event.getHeader().getEventType() + "-" + node.getId();
         if (cacheService.existEvent(key)) {
-            //todo
+            getNetworkService().removeNode(node.getId());
             return null;
         }
         cacheService.putEvent(key, event, true);
@@ -71,11 +74,12 @@ public class VersionEventHandler implements NetWorkEventHandler {
             throw new NetworkMessageException(ErrorCode.NET_MESSAGE_ERROR);
         }
         node.setVersionMessage(event);
-        node.setStatus(Node.HANDSHAKE);
-        node.setLastTime(TimeService.currentTimeMillis());
 
-        //todo
-        // getNodeDao().saveChange(NodeTransferTool.toPojo(node));
+        if (!node.isHandShake()) {
+            node.setStatus(Node.HANDSHAKE);
+            node.setLastTime(TimeService.currentTimeMillis());
+            getNodeDao().saveChange(NodeTransferTool.toPojo(node));
+        }
         return null;
     }
 
@@ -84,5 +88,12 @@ public class VersionEventHandler implements NetWorkEventHandler {
             nodeDao = NulsContext.getServiceBean(NodeDataService.class);
         }
         return nodeDao;
+    }
+
+    private NetworkService getNetworkService() {
+        if (networkService == null) {
+            networkService = NulsContext.getServiceBean(NetworkService.class);
+        }
+        return networkService;
     }
 }

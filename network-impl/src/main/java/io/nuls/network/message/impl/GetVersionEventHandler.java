@@ -32,6 +32,7 @@ import io.nuls.network.message.NetworkEventResult;
 import io.nuls.network.message.entity.GetVersionEvent;
 import io.nuls.network.message.entity.VersionEvent;
 import io.nuls.network.message.handler.NetWorkEventHandler;
+import io.nuls.network.service.NetworkService;
 
 /**
  * @author vivi
@@ -42,6 +43,8 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
     private static final GetVersionEventHandler INSTANCE = new GetVersionEventHandler();
 
     private NetworkCacheService cacheService;
+
+    private NetworkService networkService;
 
     private GetVersionEventHandler() {
         cacheService = NetworkCacheService.getInstance();
@@ -57,7 +60,7 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
         GetVersionEvent event = (GetVersionEvent) networkEvent;
         String key = event.getHeader().getEventType() + "-" + node.getId();
         if (cacheService.existEvent(key)) {
-            //todo
+            getNetworkService().removeNode(node.getId());
             return null;
         }
         cacheService.putEvent(key, event, true);
@@ -72,5 +75,12 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
 
         node.setPort(event.getExternalPort());
         return new NetworkEventResult(true, replyMessage);
+    }
+
+    private NetworkService getNetworkService() {
+        if (networkService == null) {
+            networkService = NulsContext.getServiceBean(NetworkService.class);
+        }
+        return networkService;
     }
 }

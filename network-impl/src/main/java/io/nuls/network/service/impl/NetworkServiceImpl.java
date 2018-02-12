@@ -71,6 +71,7 @@ public class NetworkServiceImpl implements NetworkService {
 
 //        GetNodeEventHandler.getInstance().setNodesManager(nodesManager);
 //        NodeEventHandler.getInstance().setNodesManager(nodesManager);
+
     }
 
     @Override

@@ -149,7 +149,7 @@ public class NettyNodesManager implements Runnable {
     public void removeNode(String nodeId) {
         if (nodes.containsKey(nodeId)) {
             Node node = nodes.get(nodeId);
-            //when other module
+            //When other modules call the interface,  close channel first
             if (StringUtils.isNotBlank(node.getChannelId())) {
                 SocketChannel channel = NioChannelMap.get(node.getChannelId());
                 if (channel != null) {
@@ -165,6 +165,7 @@ public class NettyNodesManager implements Runnable {
             nodes.remove(nodeId);
             node = null;
         }
+        //todo delete node
     }
 
     public void addNodeToGroup(String groupName, Node node) {
