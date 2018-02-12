@@ -24,16 +24,19 @@
 package io.nuls.network.service.impl;
 
 
+import io.netty.channel.socket.SocketChannel;
 import io.nuls.consensus.constant.PocConsensusConstant;
 import io.nuls.core.constant.ErrorCode;
 import io.nuls.core.constant.NulsConstant;
 import io.nuls.core.context.NulsContext;
 import io.nuls.core.exception.NulsRuntimeException;
 import io.nuls.core.thread.manager.TaskManager;
+import io.nuls.core.utils.str.StringUtils;
 import io.nuls.network.constant.NetworkConstant;
 import io.nuls.network.entity.Node;
 import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
+import io.nuls.network.service.impl.netty.NioChannelMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,6 +149,15 @@ public class NettyNodesManager implements Runnable {
     public void removeNode(String nodeId) {
         if (nodes.containsKey(nodeId)) {
             Node node = nodes.get(nodeId);
+            //when other module
+            if (StringUtils.isNotBlank(node.getChannelId())) {
+                SocketChannel channel = NioChannelMap.get(node.getChannelId());
+                if (channel != null) {
+                    channel.close();
+                }
+                return;
+            }
+
             node.destroy();
             for (String groupName : node.getGroupSet()) {
                 removeNodeFromGroup(groupName, nodeId);

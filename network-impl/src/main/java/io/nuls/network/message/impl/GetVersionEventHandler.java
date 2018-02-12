@@ -53,7 +53,6 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
 
     @Override
     public NetworkEventResult process(BaseEvent networkEvent, Node node) {
-        System.out.println("-----------------GetVersionEventHandler-------------------" + node.getId());
 
         GetVersionEvent event = (GetVersionEvent) networkEvent;
         String key = event.getHeader().getEventType() + "-" + node.getId();
