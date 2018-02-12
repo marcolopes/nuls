@@ -162,7 +162,6 @@ public class NettyNodesManager implements Runnable {
                 removeNodeFromGroup(groupName, nodeId);
             }
             nodes.remove(nodeId);
-            node = null;
         }
         //todo delete node
     }

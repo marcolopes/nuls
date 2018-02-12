@@ -30,7 +30,7 @@ public class ClientChannelHandler extends ChannelInboundHandlerAdapter {
 
         Node node = getNetworkService().getNode(channel.remoteAddress().getHostString());
         //check node exist
-        if (node != null && node.getStatus() != Node.WAIT) {
+        if (node == null || (node != null && node.getStatus() != Node.WAIT)) {
             ctx.channel().close();
             return;
         }
