@@ -105,7 +105,7 @@ public class Node extends BaseNulsData {
     public Node(AbstractNetworkParam network) {
         this();
         this.magicNumber = network.packetMagic();
-        this.groupSet = new ConcurrentHashMap<>().newKeySet();
+        this.groupSet = ConcurrentHashMap.newKeySet();
     }
 
     public Node(AbstractNetworkParam network, int type) {

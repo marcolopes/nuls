@@ -38,7 +38,7 @@ public class NodeGroup {
     public NodeGroup(String groupName) {
         this.groupName = groupName;
         nodeMap = new ConcurrentHashMap<>();
-        areaSet = new ConcurrentHashMap<>().newKeySet();
+        areaSet = ConcurrentHashMap.newKeySet();
     }
 
     public Map<String, Node> getNodes() {
