@@ -155,7 +155,7 @@ public class NettyNodesManager implements Runnable {
                     channel.close();
                     return;
                 }
-        }
+            }
 
             node.destroy();
             for (String groupName : node.getGroupSet()) {

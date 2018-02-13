@@ -80,7 +80,7 @@ public class VersionEventHandler implements NetWorkEventHandler {
         if (!node.isHandShake()) {
             node.setStatus(Node.HANDSHAKE);
             node.setLastTime(TimeService.currentTimeMillis());
-            //getNodeDao().saveChange(NodeTransferTool.toPojo(node));
+            getNodeDao().saveChange(NodeTransferTool.toPojo(node));
         }
         return null;
     }

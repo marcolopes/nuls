@@ -39,13 +39,12 @@ public class NetworkCacheService {
 
     private static final String PING_EVENT_CACHE = "ping-event-cache";
 
-
     private static final NetworkCacheService INSTANCE = new NetworkCacheService();
 
     private NetworkCacheService() {
         this.cacheService = NulsContext .getServiceBean(CacheService.class);
-        this.cacheService.createCache(PING_EVENT_CACHE,5, 6, 0);
-        this.cacheService.createCache(NETWORK_EVENT_CACHE,10, 60, 0);
+        this.cacheService.createCache(PING_EVENT_CACHE,5, 4, 0);
+        this.cacheService.createCache(NETWORK_EVENT_CACHE,10, 50, 0);
     }
 
     public static NetworkCacheService getInstance() {
