@@ -46,7 +46,7 @@ public class DevNetworkParam extends AbstractNetworkParam {
         this.maxInCount = NetworkContext.getNetworkConfig().getPropValue(NetworkConstant.NETWORK_NODE_MAX_IN, 20);
         this.maxOutCount = NetworkContext.getNetworkConfig().getPropValue(NetworkConstant.NETWORK_NODE_MAX_OUT, 10);
         this.port = NulsContext.MODULES_CONFIG.getCfgValue(NetworkConstant.NETWORK_SECTION, NetworkConstant.NETWORK_SERVER_PORT, 8003);
-        this.port = NulsContext.MODULES_CONFIG.getCfgValue(NetworkConstant.NETWORK_SECTION, NetworkConstant.NETWORK_EXTER_PORT, 8003);
+        this.externalPort = NulsContext.MODULES_CONFIG.getCfgValue(NetworkConstant.NETWORK_SECTION, NetworkConstant.NETWORK_EXTER_PORT, 8003);
         this.packetMagic = NulsContext.MODULES_CONFIG.getCfgValue(NetworkConstant.NETWORK_SECTION, NetworkConstant.NETWORK_MAGIC, 123456789);
 
         InetSocketAddress address0 = new InetSocketAddress("192.168.1.203", port);
@@ -57,15 +57,6 @@ public class DevNetworkParam extends AbstractNetworkParam {
        // seedNodes.add(address1);
         seedNodes.add(address2);
        // seedNodes.add(address3);
-
-
-
-
-
-
-
-
-
 
 
         this.messageFilter = DefaultMessageFilter.getInstance();
