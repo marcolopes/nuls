@@ -70,9 +70,10 @@ public class GetVersionEventHandler implements NetWorkEventHandler {
         Block block = NulsContext.getInstance().getBestBlock();
         VersionEvent replyMessage;
         if (block == null) {
-            replyMessage = new VersionEvent(0, "T");
+            replyMessage = new VersionEvent(getNetworkService().getNetworkParam().getExternalPort(), 0, "T");
         } else {
-            replyMessage = new VersionEvent(block.getHeader().getHeight(), block.getHeader().getHash().getDigestHex());
+            replyMessage = new VersionEvent(getNetworkService().getNetworkParam().getExternalPort(),
+                    block.getHeader().getHeight(), block.getHeader().getHash().getDigestHex());
         }
 
         node.setPort(event.getExternalPort());

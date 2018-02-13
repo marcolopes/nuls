@@ -146,7 +146,7 @@ public class NodeDiscoverHandler implements Runnable {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             for (Node node : nodesManager.getNodes().values()) {
                 if (node.isAlive()) {
-                    GetVersionEvent event = new GetVersionEvent();
+                    GetVersionEvent event = new GetVersionEvent(network.getExternalPort());
                     broadcaster.broadcastToNode(event, node, true);
                 }
             }

@@ -79,6 +79,7 @@ public class VersionEventHandler implements NetWorkEventHandler {
 
         if (!node.isHandShake()) {
             node.setStatus(Node.HANDSHAKE);
+            node.setPort(event.getExternalPort());
             node.setLastTime(TimeService.currentTimeMillis());
             getNodeDao().saveChange(NodeTransferTool.toPojo(node));
         }
