@@ -96,8 +96,6 @@ public class Node extends BaseNulsData {
 
     private VersionEvent versionMessage;
 
-    private NetworkEventHandlerFactory messageHandlerFactory;
-
     public Node() {
         super(OWN_MAIN_VERSION, OWN_SUB_VERSION);
     }
@@ -126,156 +124,6 @@ public class Node extends BaseNulsData {
         this.ip = socketAddress.getHostString();
     }
 
-//    public void connectionOpened() throws IOException {
-//        GetVersionEvent event = new GetVersionEvent(AbstractNetworkModule.ExternalPort);
-//        sendNetworkEvent(event);
-//    }
-
-//    public void sendMessage(NulsMessage message) throws IOException {
-//        if (this.getStatus() == Node.CLOSE) {
-//            return;
-//        }
-//        if (writeTarget == null || this.status != Node.HANDSHAKE) {
-//            throw new NotYetConnectedException();
-//        }
-//        lock.lock();
-//        try {
-//            System.out.println("---send message:" + Hex.encode(message.serialize()));
-//            this.writeTarget.write(message.serialize());
-//        } finally {
-//            lock.unlock();
-//        }
-//    }
-
-//    public void sendNetworkEvent(BaseEvent event) throws IOException {
-//        if (this.getStatus() == Node.CLOSE) {
-//            return;
-//        }
-//        if (writeTarget == null) {
-//            throw new NotYetConnectedException();
-//        }
-//        if (this.status != Node.HANDSHAKE && !isHandShakeMessage(event)) {
-//            throw new NotYetConnectedException();
-//        }
-//        lock.lock();
-//        try {
-//            byte[] data = event.serialize();
-//            NulsMessage message = new NulsMessage(magicNumber, data);
-//            this.writeTarget.write(message.serialize());
-//        } finally {
-//            lock.unlock();
-//        }
-//    }
-
-    /**
-     * process the receive message
-     *
-     * @throws IOException
-     */
-//    public void receiveMessage(ByteBuffer buffer) throws IOException, NulsException {
-//        buffer.flip();
-//        if (this.getStatus() == Node.CLOSE) {
-//            return;
-//        }
-//        if (buffer.position() != 0 || buffer.limit() <= NulsMessageHeader.MESSAGE_HEADER_SIZE || buffer.limit() > NetworkConstant.MESSAGE_MAX_SIZE) {
-//            buffer.clear();
-//            throw new NulsVerificationException(ErrorCode.DATA_ERROR);
-//        }
-//
-//        NulsMessage message = new NulsMessage(buffer);
-//
-////        buffer.compact();
-//        buffer.clear();
-//        try {
-//            if (MessageFilterChain.getInstance().doFilter(message)) {
-//                processMessage(message);
-//            }
-//        } catch (Exception e) {
-//
-//        }
-//
-//    }
-
-    /**
-     * if message is not a networkEvent, put it in eventProducer ,other module will consume it
-     */
-//    public void processMessage(NulsMessage message) throws IOException, NulsException {
-//        BaseEvent event = null;
-//        try {
-//            event = EventManager.getInstance(message.getData());
-//        } catch (Exception e) {
-//            event = null;
-//        }
-//        if (event == null) {
-//            return;
-//        }
-//
-//        if (isNetworkEvent(event)) {
-//            if (this.status != Node.HANDSHAKE && !isHandShakeMessage(event)) {
-//                return;
-//            }
-//
-//            BaseEvent networkEvent = (BaseEvent) event;
-//            asynExecute(networkEvent);
-//        } else {
-//
-//            if (this.status != Node.HANDSHAKE) {
-//                return;
-//            }
-////            if (checkBroadcastExist(message.getData())) {
-////                return;
-////            }
-//            eventBusService.publishNetworkEvent(event, this.getIp());
-//        }
-//    }
-
-//    private void asynExecute(BaseEvent networkEvent) {
-//        NetWorkEventHandler handler = messageHandlerFactory.getHandler(networkEvent);
-//        TaskManager.asynExecuteRunnable(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    NetworkEventResult messageResult = handler.process(networkEvent, Node.this);
-//                    processMessageResult(messageResult);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    Log.error("process message error", e);
-//                    Node.this.destroy();
-//                }
-//            }
-//        });
-//    }
-
-//    public boolean checkBroadcastExist(byte[] data) throws IOException {
-//        String hash = Sha256Hash.twiceOf(data).toString();
-//        BroadcastResult result = NetworkCacheService.getInstance().getBroadCastResult(hash);
-//        if (result == null) {
-//            return false;
-//        }
-//
-//        result.setRepliedCount(result.getRepliedCount() + 1);
-//        if (result.getRepliedCount() < result.getWaitReplyCount()) {
-//            NetworkCacheService.getInstance().addBroadCastResult(result);
-//        } else {
-//            ReplyNotice event = new ReplyNotice();
-//            event.setEventBody(new BasicTypeData<>(data));
-//            eventBusService.publishLocalEvent(event);
-//        }
-//        return true;
-//    }
-
-
-//    public void processMessageResult(NetworkEventResult eventResult) throws IOException {
-//        if (this.getStatus() == Node.CLOSE) {
-//            return;
-//        }
-//        if (eventResult == null || !eventResult.isSuccess()) {
-//            return;
-//        }
-//        if (eventResult.getReplyMessage() != null) {
-//            sendNetworkEvent(eventResult.getReplyMessage());
-//        }
-//    }
     public void destroy() {
         this.lastFailTime = TimeService.currentTimeMillis();
         this.status = Node.CLOSE;
@@ -312,17 +160,6 @@ public class Node extends BaseNulsData {
         ip = new String(buffer.readByLengthByte());
     }
 
-
-    public boolean isHandShakeMessage(BaseEvent event) {
-        if (isNetworkEvent(event)) {
-            if (event.getHeader().getEventType() == NetworkConstant.NETWORK_GET_VERSION_EVENT
-                    || event.getHeader().getEventType() == NetworkConstant.NETWORK_VERSION_EVENT) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean isHandShake() {
         return this.status == Node.HANDSHAKE;
     }
@@ -331,23 +168,40 @@ public class Node extends BaseNulsData {
         return this.status == Node.CONNECT || status == Node.HANDSHAKE;
     }
 
-    private boolean isNetworkEvent(BaseEvent event) {
-        return event.getHeader().getModuleId() == NulsConstant.MODULE_ID_NETWORK;
+    public void addToGroup(NodeGroup nodeGroup) {
+        if (nodeGroup != null) {
+            this.groupSet.add(nodeGroup.getName());
+        }
+    }
+
+    public void removeFromGroup(NodeGroup nodeGroup) {
+        if (nodeGroup != null) {
+            this.groupSet.remove(nodeGroup.getName());
+        }
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("{node:{");
-        sb.append("ip:' " + getIp() + "',");
+        sb.append("{");
+        sb.append("ip: '" + getIp() + "',");
         sb.append("port: " + getPort() + ",");
         if (lastTime == null) {
             lastTime = System.currentTimeMillis();
         }
 
         sb.append("lastTime: " + DateUtil.convertDate(new Date(lastTime)) + ",");
-        sb.append("magicNumber: " + magicNumber + "}}");
+        sb.append("magicNumber: " + magicNumber + "}");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Node other = (Node) obj;
+        if (StringUtils.isBlank(other.getId())) {
+            return false;
+        }
+        return other.getId().equals(this.getId());
     }
 
     public int getType() {
@@ -390,7 +244,6 @@ public class Node extends BaseNulsData {
         this.versionMessage = versionMessage;
     }
 
-
     public Long getLastTime() {
         return lastTime;
     }
@@ -426,35 +279,6 @@ public class Node extends BaseNulsData {
         this.magicNumber = magicNumber;
     }
 
-    public void setMessageHandlerFactory(NetworkEventHandlerFactory factory) {
-        this.messageHandlerFactory = factory;
-    }
-
-    public NetworkEventHandlerFactory getMessageHandlerFactory() {
-        return this.messageHandlerFactory;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        Node other = (Node) obj;
-        if (StringUtils.isBlank(other.getId())) {
-            return false;
-        }
-        return other.getId().equals(this.getId());
-    }
-
-    public void addToGroup(NodeGroup nodeGroup) {
-        if (nodeGroup != null) {
-            this.groupSet.add(nodeGroup.getName());
-        }
-    }
-
-    public void removeFromGroup(NodeGroup nodeGroup) {
-        if (nodeGroup != null) {
-            this.groupSet.remove(nodeGroup.getName());
-        }
-    }
-
     public int getGroupCount(String groupName) {
         return this.groupSet.size();
     }
@@ -473,7 +297,6 @@ public class Node extends BaseNulsData {
     public void setLastFailTime(Long lastFailTime) {
         this.lastFailTime = lastFailTime;
     }
-
 
     public String getId() {
         return ip;

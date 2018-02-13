@@ -43,6 +43,8 @@ import io.nuls.network.param.TestNetworkParam;
 import io.nuls.network.service.NetworkService;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author vivi
@@ -119,6 +121,17 @@ public class NetworkServiceImpl implements NetworkService {
     @Override
     public Node getNode(String nodeId) {
         return nodesManager.getNode(nodeId);
+    }
+
+    @Override
+    public List<Node> getAvailableNodes() {
+        List<Node> nodes = new ArrayList<>();
+        for (Node node : nodesManager.getNodes().values()) {
+            if (node.isHandShake()) {
+                nodes.add(node);
+            }
+        }
+        return nodes;
     }
 
     @Override

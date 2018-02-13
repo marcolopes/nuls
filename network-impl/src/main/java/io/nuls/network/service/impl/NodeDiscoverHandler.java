@@ -108,37 +108,32 @@ public class NodeDiscoverHandler implements Runnable {
      *
      * @param size
      */
-    private void findOtherNode(int size) {
+    public void findOtherNode(int size) {
         NodeGroup group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_IN_GROUP);
         if (group.getNodes().size() > 0) {
-            Node node = group.getNodes().get(0);
-            if (node.isHandShake()) {
-                try {
+            for(Node node : group.getNodes().values()) {
+                if(node.isHandShake()) {
                     GetNodeEvent event = new GetNodeEvent(size);
                     broadcaster.broadcastToNode(event, node, true);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    break;
                 }
             }
         }
-//
-//        group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-//        if (group.getNodes().size() > 0) {
-//            Node node = group.getNodes().get(0);
-//            if (node.isHandShake()) {
-//                try {
-//                    GetNodeEvent data = new GetNodeEvent(size);
-//                    node.sendNetworkData(data);
-//                } catch (Exception e) {
-//                    Log.warn("send getNodeData error", e);
-//                    node.destroy();
-//                }
-//            }
-//        }
+
+        group = nodesManager.getNodeGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP);
+        if (group.getNodes().size() > 0) {
+            for(Node node : group.getNodes().values()) {
+                if(node.isHandShake()) {
+                    GetNodeEvent event = new GetNodeEvent(size);
+                    broadcaster.broadcastToNode(event, node, true);
+                    break;
+                }
+            }
+        }
     }
 
     /**
-     * check the nodes when closed try to connect other one
+     * do ping/pong and ask versionMessage
      */
     @Override
     public void run() {

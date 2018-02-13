@@ -30,6 +30,7 @@ import io.nuls.network.entity.NodeGroup;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * @author vivi
@@ -46,6 +47,8 @@ public interface NetworkService {
     void removeNode(String nodeId);
 
     Node getNode(String nodeId);
+
+    List<Node> getAvailableNodes();
 
     void blackNode(String nodeId, int status);
 

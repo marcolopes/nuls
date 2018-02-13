@@ -99,7 +99,10 @@ public class NettyNodesManager implements Runnable {
      * running node discovery thread
      */
     public void start() {
-        List<Node> nodes = getSeedNodes();
+        List<Node> nodes = discoverHandler.getLocalNodes(network.maxOutCount());
+        if (nodes == null && nodes.isEmpty()) {
+            nodes = getSeedNodes();
+        }
         for (Node node : nodes) {
             node.setType(Node.OUT);
             node.setStatus(Node.WAIT);
@@ -194,7 +197,7 @@ public class NettyNodesManager implements Runnable {
     }
 
     /**
-     * check connecting node enough
+     * check the nodes when closed try to connect other one
      */
     @Override
     public void run() {
@@ -213,19 +216,19 @@ public class NettyNodesManager implements Runnable {
                 }
             }
 
-//            NodeGroup group = nodeGroups.get(NetworkConstant.NETWORK_NODE_OUT_GROUP);
-//            if (group.size() < network.maxOutCount()) {
-//                List<Node> nodes = discoverHandler.getLocalNodes(network.maxOutCount() - group.size());
-//                if (!nodes.isEmpty()) {
-//                    for (Node node : nodes) {
-//                        node.setType(Node.OUT);
-//                        node.setStatus(Node.WAIT);
-//                        addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
-//                    }
-//                } else {
-//
-//                }
-//            }
+            NodeGroup group = nodeGroups.get(NetworkConstant.NETWORK_NODE_OUT_GROUP);
+            if (group.size() < network.maxOutCount()) {
+                List<Node> nodes = discoverHandler.getLocalNodes(network.maxOutCount() - group.size());
+                if (!nodes.isEmpty()) {
+                    for (Node node : nodes) {
+                        node.setType(Node.OUT);
+                        node.setStatus(Node.WAIT);
+                        addNodeToGroup(NetworkConstant.NETWORK_NODE_OUT_GROUP, node);
+                    }
+                } else {
+                   discoverHandler.findOtherNode(network.maxOutCount() - group.size());
+                }
+            }
             try {
                 Thread.sleep(6000);
             } catch (InterruptedException e) {
