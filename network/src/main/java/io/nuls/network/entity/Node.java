@@ -158,6 +158,7 @@ public class Node extends BaseNulsData {
         magicNumber = (int) buffer.readVarInt();
         port = (int) buffer.readVarInt();
         ip = new String(buffer.readByLengthByte());
+        this.groupSet = ConcurrentHashMap.newKeySet();
     }
 
     public boolean isHandShake() {
