@@ -35,7 +35,6 @@ import io.nuls.network.entity.NodeTransferTool;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 import io.nuls.network.message.entity.GetNodeEvent;
 import io.nuls.network.message.entity.GetVersionEvent;
-import io.nuls.network.service.NetworkService;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class NodeDiscoverHandler implements Runnable {
 
     private AbstractNetworkParam network;
 
-    private NettyNodesManager nodesManager;
+    private NodesManager nodesManager;
 
     private NodeDataService nodeDao;
 
@@ -157,7 +156,7 @@ public class NodeDiscoverHandler implements Runnable {
         this.network = network;
     }
 
-    public void setNodesManager(NettyNodesManager nodesManager) {
+    public void setNodesManager(NodesManager nodesManager) {
         this.nodesManager = nodesManager;
     }
 

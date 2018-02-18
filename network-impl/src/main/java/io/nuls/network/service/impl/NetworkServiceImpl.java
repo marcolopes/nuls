@@ -54,9 +54,9 @@ public class NetworkServiceImpl implements NetworkService {
 
     private AbstractNetworkParam network;
 
-    private NettyConnectionManager connectionManager;
+    private ConnectionManager connectionManager;
 
-    private NettyNodesManager nodesManager;
+    private NodesManager nodesManager;
 
     private BroadcastHandler broadcaster;
 
@@ -65,11 +65,11 @@ public class NetworkServiceImpl implements NetworkService {
         NulsMessageFilter messageFilter = DefaultMessageFilter.getInstance();
         network.setMessageFilter(messageFilter);
 
-        this.connectionManager = NettyConnectionManager.getInstance();
+        this.connectionManager = ConnectionManager.getInstance();
         connectionManager.setNetwork(network);
         connectionManager.setNetworkService(this);
 
-        this.nodesManager = NettyNodesManager.getInstance();
+        this.nodesManager = NodesManager.getInstance();
         nodesManager.setNetwork(network);
         nodesManager.setConnectionManager(connectionManager);
 

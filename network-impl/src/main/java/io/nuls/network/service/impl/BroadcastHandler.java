@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class BroadcastHandler {
 
-    private NettyNodesManager nodesManager;
+    private NodesManager nodesManager;
 
     private AbstractNetworkParam network;
 
@@ -378,7 +378,7 @@ public class BroadcastHandler {
         this.network = network;
     }
 
-    public void setNodesManager(NettyNodesManager nodesManager) {
+    public void setNodesManager(NodesManager nodesManager) {
         this.nodesManager = nodesManager;
     }
 }
