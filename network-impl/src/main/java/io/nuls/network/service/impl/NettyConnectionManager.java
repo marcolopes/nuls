@@ -36,6 +36,7 @@ import io.nuls.network.entity.Node;
 import io.nuls.network.entity.param.AbstractNetworkParam;
 import io.nuls.network.message.NetworkEventHandlerFactory;
 import io.nuls.network.message.NetworkEventResult;
+import io.nuls.network.message.filter.MessageFilterChain;
 import io.nuls.network.message.handler.NetWorkEventHandler;
 import io.nuls.network.service.NetworkService;
 import io.nuls.network.service.impl.netty.NettyClient;
@@ -43,6 +44,8 @@ import io.nuls.network.service.impl.netty.NettyServer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author vivi
@@ -58,7 +61,8 @@ public class NettyConnectionManager {
 
     private static NettyConnectionManager instance = new NettyConnectionManager();
 
-    private NettyConnectionManager() {}
+    private NettyConnectionManager() {
+    }
 
     public static NettyConnectionManager getInstance() {
         return instance;
@@ -96,15 +100,32 @@ public class NettyConnectionManager {
     }
 
     public void receiveMessage(ByteBuffer buffer, Node node) {
-        buffer.flip();
         try {
-            NulsMessage message = new NulsMessage(buffer);
-            BaseEvent event = EventManager.getInstance(message.getData());
-            processMessage(event, node);
+            buffer.flip();
+            if (!node.isAlive()) {
+                buffer.clear();
+                return;
+            }
+            List<NulsMessage> list = new ArrayList<>();
+            while (buffer.hasRemaining()) {
+                NulsMessage message = new NulsMessage(buffer);
+                list.add(message);
+            }
+            for (NulsMessage message : list) {
+                if (MessageFilterChain.getInstance().doFilter(message)) {
+                    BaseEvent event = EventManager.getInstance(message.getData());
+                    processMessage(event, node);
+                }
+            }
         } catch (NulsException e) {
+            //todo
             e.printStackTrace();
         } catch (Exception e) {
+            //todo
+            e.printStackTrace();
             return;
+        } finally {
+            buffer.clear();
         }
     }
 

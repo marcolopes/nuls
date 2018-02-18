@@ -93,7 +93,6 @@ public class ServerChannelHandler extends ChannelInboundHandlerAdapter {
             buf.release();
             ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
             buffer.put(bytes);
-
             getNetworkService().receiveMessage(buffer, node);
         }
     }
