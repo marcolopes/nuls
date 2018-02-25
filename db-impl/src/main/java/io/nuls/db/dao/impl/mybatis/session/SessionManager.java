@@ -39,16 +39,20 @@ import java.util.Map;
  */
 public class SessionManager {
 
-    private static SqlSessionFactory sqlSessionFactory;
+    private SqlSessionFactory sqlSessionFactory;
 
-    private static ThreadLocal<Map<String, SqlSession>> sessionHolder = new ThreadLocal<>();
-    private static ThreadLocal<Map<String, Boolean>> txHolder = new ThreadLocal<>();
-    private static ThreadLocal<String> idHolder = new ThreadLocal<>();
+    private ThreadLocal<Map<String, SqlSession>> sessionHolder = new ThreadLocal<>();
+    private ThreadLocal<Map<String, Boolean>> txHolder = new ThreadLocal<>();
+    private ThreadLocal<String> idHolder = new ThreadLocal<>();
 
-    public static String getId() {
-        return idHolder.get();
+    private String id;
+    
+    public SessionManager(String id) {
+        this.id = id;
     }
 
+    ...
+    
     public static void setId(String id) {
         idHolder.remove();
         idHolder.set(id);
