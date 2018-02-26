@@ -40,14 +40,7 @@ public class TaskManager {
     private static final String TEMPORARY_THREAD_POOL_NAME = "temporary";
     private static final int TEMPORARY_THREAD_POOL_COUNT = 10;
     private static final int TEMPORARY_THREAD_POOL_QUEUE_SIZE = 1000;
-    private static final ThreadPoolExecutor TEMPORARY_THREAD_POOL;
-
-    /**
-     * Initializing a temporary thread pool
-     */
-    static {
-        TEMPORARY_THREAD_POOL = createThreadPool(TEMPORARY_THREAD_POOL_COUNT, TEMPORARY_THREAD_POOL_QUEUE_SIZE, new NulsThreadFactory((short) 0, TEMPORARY_THREAD_POOL_NAME));
-    }
+    private static final ThreadPoolExecutor TEMPORARY_THREAD_POOL = createThreadPool(TEMPORARY_THREAD_POOL_COUNT, TEMPORARY_THREAD_POOL_QUEUE_SIZE, new NulsThreadFactory((short) 0, TEMPORARY_THREAD_POOL_NAME));
 
     public static final void putThread(short moduleId, String poolName, String threadName, BaseThread newThread){
         THREAD_DATA_CACHE.putThread(moduleId,poolName,threadName,newThread);
